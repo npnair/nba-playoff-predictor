@@ -1,0 +1,23 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run tests
+        run: pytest -q
+      - name: Check docs/js/data.js matches the CSVs
+        run: |
+          python scripts/build_web_data.py --as-of "$(grep -o '"asOf": "[^"]*"' docs/js/data.js | cut -d'"' -f4)"
+          git diff --exit-code docs/js/data.js || (echo "Run scripts/build_web_data.py and commit docs/js/data.js" && exit 1)
+      - name: Smoke test the command line
+        run: python -m predictor --sims 500 --seed 1

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Playoff Line 2027</title>
+  <meta name="description" content="NBA 2026-27 playoff predictor: Monte Carlo projections of each conference's top 6 seeds and play-in teams.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">NBA 2026–27 · Monte Carlo standings model</div>
+      <h1>Playoff <span>Line</span> 2027</h1>
+      <p class="lede">Who finishes 1 through 6 and goes straight to the playoffs, and who lands in seeds 7 through 10 for the play-in. Each team is rated from last season's net rating adjusted for offseason moves, this year's preseason line and preseason games, then docked for injured players game by game. Real 2026–27 results take over as the season goes.</p>
+    </div>
+    <div class="status">
+      <div class="stat"><span class="eyebrow">Avg games played</span><b id="gpStat">0</b></div>
+      <div class="stat"><span class="eyebrow">Weight on 2026–27 games</span><b id="wStat">0%</b></div>
+      <div class="stat"><span class="eyebrow">Injuries tracked</span><b id="injStat">0</b></div>
+      <div class="stat"><span class="eyebrow">Seasons simulated</span><b id="simStat">0</b></div>
+    </div>
+  </header>
+
+  <section class="boards">
+    <div class="board" id="board-West"></div>
+    <div class="board" id="board-East"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Model inputs</h2>
+    <div class="controls">
+      <div class="field"><label for="wLast">Last season (2025–26): <span id="vLast"></span></label><input type="range" id="wLast" min="0" max="100" value="30"></div>
+      <div class="field"><label for="wLine">Preseason win total: <span id="vLine"></span></label><input type="range" id="wLine" min="0" max="100" value="60"></div>
+      <div class="field"><label for="wPre">Preseason games: <span id="vPre"></span></label><input type="range" id="wPre" min="0" max="100" value="10"></div>
+    </div>
+    <div class="mix" aria-hidden="true"><i class="m1" id="mix1"></i><i class="m2" id="mix2"></i><i class="m3" id="mix3"></i></div>
+    <div class="mixkey"><span><i class="dot" style="background:var(--ball)"></i>Last season net rating, regressed 30%, plus offseason moves</span><span><i class="dot" style="background:var(--playin)"></i>Win total line (prices in trades and signings)</span><span><i class="dot" style="background:var(--muted)"></i>Preseason W-L</span></div>
+    <p class="hint">Sliders are relative and rescale to 100%.</p>
+    <div class="controls">
+      <div class="field"><label for="kRange">Pre-2026–27 evidence counts as: <span id="kVal">25</span> games</label><input type="range" id="kRange" min="5" max="60" step="1" value="25"></div>
+      <div class="field"><label for="simSel">Simulations</label><select id="simSel"><option>2000</option><option selected>5000</option><option>10000</option></select></div>
+      <div class="field"><label for="asof">Stats as of</label><input type="text" id="asof"></div>
+      <button id="runBtn">Simulate season</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <details open>
+      <summary>Offseason moves</summary>
+      <p class="hint" style="margin-top:8px">Last season's net rating describes last season's roster. Each row adjusts it for a player who arrived, left, or returns from a long injury. Impact is points of net rating per game: positive for a gain, negative for a loss.</p>
+      <div class="scroll" style="margin-top:12px"><table class="edit injt" id="movesTable"></table></div>
+      <div class="row" style="margin-top:10px"><button class="ghost" id="addMove">Add move</button><span class="msg" id="movesMsg"></span></div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <details open>
+      <summary>Injuries</summary>
+      <p class="hint" style="margin-top:8px">Impact is how many points of net rating the team loses while the player is out. Games out counts from now. A team's rating is lowered for exactly those games in each simulated season.</p>
+      <div class="scroll" style="margin-top:12px"><table class="edit injt" id="injTable"></table></div>
+      <div class="row" style="margin-top:10px"><button class="ghost" id="addInj">Add injury</button><span class="msg" id="injMsg"></span></div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <details>
+      <summary>Team stats</summary>
+      <p class="hint" style="margin-top:8px">2026–27: current record and average point differential per game. History: preseason win total, last season's net rating and this preseason's record. Edits save in this browser. Export the standings to update <code>data/standings.csv</code> in the repo.</p>
+      <div class="edit-grid" id="editGrid"></div>
+      <div style="margin-top:18px;display:flex;flex-direction:column;gap:8px">
+        <label for="paste">Paste 2026–27 standings (one team per line: ABBR, W, L, PD/G)</label>
+        <textarea id="paste" placeholder="OKC, 5, 1, 11.2&#10;SAS, 4, 2, 6.8&#10;NYK, 3, 3, 0.9"></textarea>
+        <div class="row">
+          <button class="ghost" id="pasteBtn">Apply pasted stats</button>
+          <button class="ghost" id="exportBtn">Export standings CSV</button>
+          <button class="ghost" id="resetBtn">Restore repo data</button>
+          <span class="msg" id="pasteMsg"></span>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>How it predicts</h2>
+    <div class="method">
+      <div><h3>1. Build a preseason rating</h3><p>Three views of each team, in points of margin per game: last season's net rating shrunk 30% toward zero plus offseason moves, the win total line converted at 2.7 wins per point, and preseason record (smoothed heavily). The sliders set the mix.</p></div>
+      <div><h3>2. Blend in 2026–27 games</h3><p>Once games are played, actual point differential is mixed in. With the evidence setting at 25, a team 25 games in is rated half on the preseason rating and half on its real margin.</p></div>
+      <div><h3>3. Apply injuries game by game</h3><p>For each remaining game, the team plays below its rating by the impact of every player still out. Opponents' injuries count too.</p></div>
+      <div><h3>4. Play out and seed</h3><p>Each game goes to a random opponent with home court worth 2.5 points. Teams are ranked by wins, then 7 vs 8 and 9 vs 10 play in, and the 7/8 loser hosts the 9/10 winner for the last spot.</p></div>
+      <div><h3>Clinched and Out</h3><p>Clinched means no more than five conference rivals can still reach this team's win total. Out means ten rivals already have more wins than it can reach. Tiebreakers are ignored.</p></div>
+      <div><h3>Known overlap</h3><p>The win total line already prices injuries reported before mid-October, so long absences count partly twice. Impacts are kept moderate to offset that.</p></div>
+    </div>
+    <p class="src">Data: 2025–26 net ratings from <a href="https://www.basketball-reference.com/leagues/NBA_2026_ratings.html" target="_blank" rel="noopener">Basketball Reference</a>. Win totals from DraftKings via <a href="https://www.si.com/betting/nba-win-total-predictions-for-every-team-in-2026-27-season-thunder-spurs-only-teams-projected-to-win-60-games" target="_blank" rel="noopener">Sports Illustrated</a> (Oct 15, 2026). Preseason records from <a href="https://basketball.realgm.com/nba/preseason/standings" target="_blank" rel="noopener">RealGM</a>. Injuries from <a href="https://www.covers.com/sport/basketball/nba/injuries" target="_blank" rel="noopener">Covers</a> (Oct 19, 2026). Injury and move impacts are the author's estimates.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Playoff Line 2027 · open source on GitHub</span>
+    <span>Not affiliated with the NBA. For fun and analysis, not betting advice.</span>
+  </footer>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/model.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

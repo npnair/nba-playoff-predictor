@@ -1,0 +1,31 @@
+id,name,conference,win_total,last_w,last_l,last_net_rating,pre_w,pre_l
+OKC,Oklahoma City Thunder,West,62.5,64,18,11.05,1,4
+SAS,San Antonio Spurs,West,60.5,62,20,8.27,2,3
+DEN,Denver Nuggets,West,48.5,54,28,5.17,3,2
+MIN,Minnesota Timberwolves,West,47.5,49,33,3.08,3,3
+HOU,Houston Rockets,West,47.5,52,30,5.39,2,1
+LAL,Los Angeles Lakers,West,45.5,53,29,1.74,2,3
+POR,Portland Trail Blazers,West,41.5,42,40,-0.17,3,1
+PHX,Phoenix Suns,West,39.5,45,37,1.42,1,4
+GSW,Golden State Warriors,West,37.5,37,45,-0.55,4,2
+UTA,Utah Jazz,West,36.5,22,60,-8.21,3,1
+DAL,Dallas Mavericks,West,33.5,26,56,-5.43,1,3
+MEM,Memphis Grizzlies,West,29.5,25,57,-5.9,3,1
+LAC,LA Clippers,West,28.5,42,40,1.13,2,1
+NOP,New Orleans Pelicans,West,28.5,26,56,-4.65,3,1
+SAC,Sacramento Kings,West,20.5,22,60,-10.07,0,5
+NYK,New York Knicks,East,52.5,53,29,6.47,1,4
+BOS,Boston Celtics,East,51.5,56,26,8.15,4,0
+PHI,Philadelphia 76ers,East,50.5,45,37,-0.17,1,3
+DET,Detroit Pistons,East,48.5,60,22,8.23,3,1
+CLE,Cleveland Cavaliers,East,47.5,52,30,4.05,1,2
+TOR,Toronto Raptors,East,46.5,46,36,2.58,2,3
+MIA,Miami Heat,East,45.5,43,39,2.18,3,2
+IND,Indiana Pacers,East,44.5,19,63,-7.96,1,3
+ORL,Orlando Magic,East,43.5,45,37,0.56,3,1
+ATL,Atlanta Hawks,East,43.5,46,36,2.36,4,1
+CHA,Charlotte Hornets,East,38.5,44,38,5.03,1,3
+WAS,Washington Wizards,East,34.5,17,65,-11.84,2,2
+CHI,Chicago Bulls,East,29.5,31,51,-5.14,3,2
+MIL,Milwaukee Bucks,East,25.5,32,50,-6.49,2,3
+BKN,Brooklyn Nets,East,24.5,20,62,-10.27,3,1

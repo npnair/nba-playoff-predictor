@@ -1,0 +1,57 @@
+team,move,impact
+PHI,+ LeBron James (from LAL),3.0
+PHI,+ Jaylen Brown (from BOS),3.5
+PHI,- Paul George (to BOS),-1.5
+BOS,- Jaylen Brown (to PHI),-3.5
+BOS,+ Jayson Tatum (back from injury),3.0
+BOS,+ Paul George (from PHI),1.5
+BOS,+ Mitchell Robinson (from NYK),1.0
+NYK,- Mitchell Robinson (to BOS),-1.0
+LAL,- LeBron James (to PHI),-3.0
+MIA,+ Giannis Antetokounmpo (from MIL),5.0
+MIA,- Tyler Herro (to MIL),-2.0
+MIA,- Jaime Jaquez Jr. (to MIL),-1.0
+MIL,- Giannis Antetokounmpo (played 36 games),-3.0
+MIL,+ Tyler Herro (from MIA),2.0
+MIL,+ Jaime Jaquez Jr. (from MIA),1.0
+TOR,+ Kawhi Leonard (from LAC),3.5
+TOR,- Brandon Ingram (to LAC),-2.0
+TOR,- Gradey Dick (to LAC),-0.5
+LAC,- Kawhi Leonard (to TOR),-3.5
+LAC,"+ Brandon Ingram (from TOR, injured)",1.0
+LAC,+ Gradey Dick (from TOR),0.5
+POR,+ Ja Morant (from MEM),2.0
+POR,+ Damian Lillard (back from Achilles),2.0
+POR,- Jerami Grant (to MEM),-1.0
+POR,- Kris Murray (to MEM),-0.5
+MEM,- Ja Morant (to POR),-1.5
+MEM,+ Jerami Grant (from POR),1.0
+MEM,+ Kris Murray (from POR),0.5
+MEM,+ Cam Boozer (rookie),1.0
+MEM,- Santi Aldama (to DAL),-0.8
+WAS,"+ Trae Young, Anthony Davis (full season)",2.5
+WAS,+ A.J. Dybantsa (No. 1 pick),1.0
+ATL,+ Luguentz Dort (from OKC),0.8
+ATL,+ Aaron Wiggins,0.5
+ATL,- Zaccharie Risacher (to DAL),-0.3
+OKC,- Luguentz Dort (to ATL),-0.8
+MIN,+ LaMelo Ball (from CHA),2.5
+MIN,- Julius Randle (to BKN),-2.0
+CHA,- LaMelo Ball (to MIN),-2.5
+CHA,+ Coby White,1.5
+CHI,- Coby White (to CHA),-1.5
+CHI,+ Norman Powell,1.5
+CHI,+ Caleb Wilson (No. 4 pick),0.8
+BKN,+ Julius Randle (from MIN),2.0
+DET,- Tobias Harris (to SAS),-1.0
+SAS,+ Tobias Harris (from DET),1.0
+PHX,+ Miles Bridges,1.0
+DAL,+ Kyrie Irving (back from injury),3.0
+DAL,+ Santi Aldama (from MEM),0.8
+DAL,+ Zaccharie Risacher (from ATL),0.3
+UTA,+ Jaren Jackson Jr. (full season),1.5
+UTA,+ Darryn Peterson (rookie),1.0
+UTA,- Walker Kessler (traded),-1.0
+IND,+ Tyrese Haliburton (back from Achilles),5.0
+CLE,+ Peyton Watson,0.8
+CLE,- Dean Wade,-0.5
