@@ -1,0 +1,46 @@
+name: update standings
+
+# Every morning after the previous night's games: pull standings from ESPN,
+# rerun the model, refresh the web page's data, and commit any changes.
+on:
+  schedule:
+    - cron: "17 11 * * *"   # 11:17 UTC = 4:17 AM Pacific (3:17 AM in winter)
+  workflow_dispatch:         # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-standings
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Fetch standings and rebuild projections
+        run: python scripts/update_standings.py
+
+      - name: Run tests on the new data
+        run: pytest -q
+
+      - name: Commit changes
+        run: |
+          if [ -z "$(git status --porcelain data docs results)" ]; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          label=$(grep -o '"asOf": "[^"]*"' docs/js/data.js | cut -d'"' -f4)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/standings.csv docs/js/data.js results/
+          git commit -m "Update ${label:-standings}"
+          git push

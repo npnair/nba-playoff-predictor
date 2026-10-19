@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+from datetime import date
 from pathlib import Path
 
 from .data_io import CONFERENCES, DATA_DIR, load_all
@@ -45,6 +46,9 @@ def main() -> None:
                    help="games of evidence the preseason rating counts for (default 25)")
     p.add_argument("--data-dir", type=Path, default=DATA_DIR, help="folder holding the CSV inputs")
     p.add_argument("--out", type=Path, default=None, help="optional CSV file for the full results")
+    p.add_argument("--history", type=Path, default=None,
+                   help="optional CSV to append one row per team for this run, to track odds over time")
+    p.add_argument("--date", default=None, help="date to record in --history (default today, YYYY-MM-DD)")
     args = p.parse_args()
 
     teams, injuries, moves = load_all(args.data_dir)
@@ -65,6 +69,32 @@ def main() -> None:
             writer.writeheader()
             writer.writerows(sorted(results, key=lambda r: (r["conference"], r["avg_seed"])))
         print(f"\nWrote {args.out}")
+
+    if args.history:
+        append_history(args.history, args.date or date.today().isoformat(), results)
+        print(f"Updated {args.history}")
+
+
+HISTORY_FIELDS = ["date", "id", "conference", "record", "proj_wins", "avg_seed", "top6", "play_in", "playoffs"]
+
+
+def append_history(path: Path, run_date: str, results: list[dict]) -> None:
+    """Keep one row per team per date. Rerunning on the same date replaces that date's rows."""
+    rows: list[dict] = []
+    if path.exists():
+        with open(path, newline="", encoding="utf-8") as f:
+            rows = [r for r in csv.DictReader(f) if r["date"] != run_date]
+    for r in sorted(results, key=lambda r: (r["conference"], r["avg_seed"])):
+        rows.append({
+            "date": run_date, "id": r["id"], "conference": r["conference"], "record": r["record"],
+            "proj_wins": r["proj_wins"], "avg_seed": round(r["avg_seed"], 2),
+            "top6": round(r["top6"], 4), "play_in": round(r["play_in"], 4), "playoffs": round(r["playoffs"], 4),
+        })
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=HISTORY_FIELDS)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 if __name__ == "__main__":

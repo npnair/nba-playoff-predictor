@@ -53,13 +53,32 @@ Open the web version locally by double-clicking `docs/index.html`, or serve it w
 3. Under **Build and deployment**, pick **Deploy from a branch**, branch `main`, folder `/docs`, and save.
 4. The page appears at `https://<your-username>.github.io/nba-playoff-predictor/` after a minute or two.
 
-## Updating during the season
+## Automatic daily updates
 
-All inputs are plain CSV files in `data/`:
+A scheduled GitHub Actions workflow (`.github/workflows/update-standings.yml`) keeps the standings current with no manual work:
+
+```
+ESPN standings feed ──► validate ──► data/standings.csv ──► run model (10,000 seasons) ──► docs/js/data.js
+                                                                    │                       results/projections.csv
+                                                                    └──────────────────────► results/history.csv
+```
+
+1. **Extract.** Every morning at about 4 AM Pacific, `scripts/update_standings.py` pulls the league standings from ESPN's public JSON feed (no API key needed).
+2. **Validate.** The feed is unofficial, so the run stops without writing anything if any team is missing or unrecognized, a record is impossible, league wins and losses don't balance, a point differential is implausible, or a team's record went backwards since the last run.
+3. **Transform and load.** ESPN team codes are mapped to the project's (for example `GS` to `GSW`), point differential per game is computed from points for and against, and `data/standings.csv` is rewritten.
+4. **Model and publish.** The model reruns with a date-based seed so results are reproducible. The web page's data, the latest projections and a running history of every team's odds are refreshed, the tests run on the new data, and the changes are committed.
+
+If there were no games since the last run, nothing is committed. If the feed fails validation, the run shows a red X in the Actions tab and the last good data stays in place. You can also start a run by hand from **Actions → update standings → Run workflow**.
+
+`results/history.csv` has one row per team per day (projected wins, average seed, and the chance of a top 6 seed, play-in and playoffs), which makes it easy to chart how each team's odds moved over the season.
+
+## Updating by hand
+
+Injuries and roster moves need judgment, so they are not automated. All inputs are plain CSV files in `data/`:
 
 | File | What it holds | How often to update |
 |---|---|---|
-| `standings.csv` | 2026–27 W, L and average point differential per game | Weekly |
+| `standings.csv` | 2026–27 W, L and average point differential per game | Automatic, daily |
 | `injuries.csv` | Player, impact in points, games still out | Weekly, as players return or get hurt |
 | `moves.csv` | Offseason and in-season roster changes with impact in points | After trades |
 | `teams.csv` | Names, conferences, win totals, 2025–26 record and net rating, preseason record | Once per season |
@@ -80,15 +99,20 @@ nba-playoff-predictor/
 ├── predictor/
 │   ├── data_io.py           load and validate the CSVs
 │   ├── model.py             ratings, injuries, season simulation, play-in, clinch logic
+│   ├── standings_source.py  fetch and validate the ESPN standings feed
 │   └── __main__.py          command line interface
 ├── scripts/
+│   ├── update_standings.py  the daily pipeline: fetch, validate, write, rerun model
 │   └── build_web_data.py    writes docs/js/data.js from the CSVs
+├── results/                 projections.csv (latest run) and history.csv (every run), written by the pipeline
 ├── docs/                    the web app (GitHub Pages serves this folder)
 │   ├── index.html
 │   ├── css/styles.css
 │   └── js/                  data.js (generated), model.js (same model as Python), app.js (UI)
-├── tests/test_model.py
-└── .github/workflows/tests.yml
+├── tests/                   model tests and feed parsing/validation tests
+└── .github/workflows/
+    ├── tests.yml            runs on every push
+    └── update-standings.yml runs every morning
 ```
 
 `predictor/model.py` and `docs/js/model.js` implement the same model. If you change one, change the other.
@@ -99,6 +123,7 @@ nba-playoff-predictor/
 - 2026–27 win totals: DraftKings lines as published by [Sports Illustrated](https://www.si.com/betting/nba-win-total-predictions-for-every-team-in-2026-27-season-thunder-spurs-only-teams-projected-to-win-60-games) on Oct 15, 2026
 - 2026 preseason records: [RealGM](https://basketball.realgm.com/nba/preseason/standings)
 - Injury statuses: [Covers](https://www.covers.com/sport/basketball/nba/injuries), Oct 19, 2026
+- 2026–27 standings (updated daily): ESPN's public standings feed, which is unofficial and may change without notice
 
 The impact values for injuries and roster moves are judgment-based estimates, not measured stats. They are meant to be edited.
 
@@ -111,7 +136,7 @@ The impact values for injuries and roster moves are judgment-based estimates, no
 
 ## Ideas for next steps
 
-- Pull standings automatically from an API and run the model on a schedule with GitHub Actions
+- Chart `results/history.csv` on the web page to show how each team's odds moved over the season
 - Use the real 2026–27 schedule, including home and away and rest days
 - Replace hand-set injury impacts with a player value metric
 - Track projections over time to show how each team's odds moved
