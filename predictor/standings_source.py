@@ -12,7 +12,8 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 
-ESPN_URL = "https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season={season}"
+ESPN_URL = "https://site.api.espn.com/apis/v2/sports/basketball/nba/standings?season={season}&seasontype=2"
+REGULAR_SEASON = 2  # ESPN season types: 1 = preseason, 2 = regular season, 3 = playoffs
 SEASON = 2027  # ESPN labels a season by the year it ends: 2027 = the 2026-27 season
 
 # ESPN abbreviations that differ from the ones used in data/teams.csv
@@ -76,11 +77,22 @@ def reported_season(payload: dict) -> int | None:
     return None
 
 
+def reported_season_type(payload: dict) -> int | None:
+    for block in payload.get("children") or [payload]:
+        season_type = (block.get("standings") or {}).get("seasonType")
+        if season_type is not None:
+            return int(season_type)
+    return None
+
+
 def parse_standings(payload: dict, known_ids: set[str], season: int = SEASON) -> list[StandingRow]:
     """Convert ESPN's JSON into one row per team. Raises ValueError if anything looks wrong."""
     got_season = reported_season(payload)
     if got_season is not None and got_season != season:
         raise SeasonNotAvailable(f"Feed returned season {got_season}, expected {season}")
+    got_type = reported_season_type(payload)
+    if got_type is not None and got_type != REGULAR_SEASON:
+        raise SeasonNotAvailable(f"Feed returned season type {got_type} (1 = preseason), expected regular season")
 
     entries = _entries(payload)
     if not entries:

@@ -16,7 +16,7 @@ def stat(type_, value):
     return {"name": type_, "type": type_, "value": value, "displayValue": str(value)}
 
 
-def feed(records: dict[str, tuple[int, int, float, float]], season=2027) -> dict:
+def feed(records: dict[str, tuple[int, int, float, float]], season=2027, season_type=2) -> dict:
     """Build a feed shaped like ESPN's: league -> conference children -> standings.entries."""
     teams = load_teams()
     children = []
@@ -31,7 +31,7 @@ def feed(records: dict[str, tuple[int, int, float, float]], season=2027) -> dict
                 "stats": [stat("wins", w), stat("losses", l), stat("avgpointsfor", pf), stat("avgpointsagainst", pa),
                           {"id": "0", "name": "overall", "type": "total", "summary": f"{w}-{l}"}],
             })
-        children.append({"name": f"{conf}ern Conference", "standings": {"season": season, "entries": entries}})
+        children.append({"name": f"{conf}ern Conference", "standings": {"season": season, "seasonType": season_type, "entries": entries}})
     return {"name": "National Basketball Association", "children": children}
 
 
@@ -65,6 +65,11 @@ def test_unbalanced_league_record_is_rejected():
 def test_wrong_season_is_flagged():
     with pytest.raises(SeasonNotAvailable):
         parse_standings(feed({}, season=2026), KNOWN)
+
+
+def test_preseason_records_are_not_used():
+    with pytest.raises(SeasonNotAvailable, match="preseason"):
+        parse_standings(feed({"BOS": (4, 0, 115.0, 100.0)}, season_type=1), KNOWN)
 
 
 def test_records_cannot_go_backwards():

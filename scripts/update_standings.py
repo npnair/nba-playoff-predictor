@@ -24,6 +24,7 @@ sys.path.insert(0, str(ROOT))
 from predictor.data_io import DATA_DIR, load_teams  # noqa: E402
 from predictor.standings_source import (  # noqa: E402
     SEASON, SeasonNotAvailable, _entries, check_progress, fetch_json, parse_standings, reported_season,
+    reported_season_type,
 )
 
 STANDINGS = DATA_DIR / "standings.csv"
@@ -56,7 +57,8 @@ def main() -> int:
     except (RuntimeError, OSError, json.JSONDecodeError) as e:
         report(f"Could not download standings, nothing written: {e}")
         return 1
-    report(f"Feed reports season {reported_season(payload)} with {len(_entries(payload))} team entries", error=False)
+    report(f"Feed reports season {reported_season(payload)}, type {reported_season_type(payload)}, "
+           f"with {len(_entries(payload))} team entries", error=False)
     old = read_existing()
     try:
         rows = parse_standings(payload, known, args.season)
