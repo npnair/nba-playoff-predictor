@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -22,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 
 from predictor.data_io import DATA_DIR, load_teams  # noqa: E402
 from predictor.standings_source import (  # noqa: E402
-    SEASON, SeasonNotAvailable, check_progress, fetch_json, parse_standings,
+    SEASON, SeasonNotAvailable, _entries, check_progress, fetch_json, parse_standings, reported_season,
 )
 
 STANDINGS = DATA_DIR / "standings.csv"
@@ -35,6 +36,13 @@ def read_existing() -> dict[str, tuple[int, int, float]]:
         return {r["id"]: (int(r["w"]), int(r["l"]), float(r["point_diff"] or 0)) for r in csv.DictReader(f)}
 
 
+def report(message: str, error: bool = True) -> None:
+    """Print, and also surface the message as an annotation when running in GitHub Actions."""
+    print(message, file=sys.stderr if error else sys.stdout)
+    if os.environ.get("GITHUB_ACTIONS"):
+        print(f"::{'error' if error else 'notice'}::{message}")
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--file", type=Path, help="read the ESPN JSON from a file instead of the network")
@@ -43,19 +51,28 @@ def main() -> int:
     args = p.parse_args()
 
     known = {t.id for t in load_teams()}
-    payload = json.loads(args.file.read_text()) if args.file else fetch_json(args.season)
+    try:
+        payload = json.loads(args.file.read_text()) if args.file else fetch_json(args.season)
+    except (RuntimeError, OSError, json.JSONDecodeError) as e:
+        report(f"Could not download standings, nothing written: {e}")
+        return 1
+    report(f"Feed reports season {reported_season(payload)} with {len(_entries(payload))} team entries", error=False)
     old = read_existing()
     try:
         rows = parse_standings(payload, known, args.season)
         check_progress(rows, {k: (v[0], v[1]) for k, v in old.items()})
     except SeasonNotAvailable as e:
         if all(w + l == 0 for w, l, _ in old.values()):
-            print(f"The {args.season - 1}-{str(args.season)[2:]} season isn't in the feed yet ({e}). Nothing to do.")
+            report(f"The {args.season - 1}-{str(args.season)[2:]} season isn't in the feed yet ({e}). Nothing to do.",
+                   error=False)
             return 0
-        print(f"Standings feed switched seasons mid-year, nothing written: {e}", file=sys.stderr)
+        report(f"Standings feed stopped serving this season mid-year, nothing written: {e}")
         return 1
     except ValueError as e:
-        print(f"Standings feed failed validation, nothing written: {e}", file=sys.stderr)
+        report(f"Standings feed failed validation, nothing written: {e}")
+        return 1
+    except (KeyError, TypeError, AttributeError) as e:
+        report(f"Standings feed has an unexpected format, nothing written: {e!r}")
         return 1
 
     new = {r.id: (r.w, r.l, r.point_diff) for r in rows}

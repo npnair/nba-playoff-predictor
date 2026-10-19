@@ -82,8 +82,14 @@ def parse_standings(payload: dict, known_ids: set[str], season: int = SEASON) ->
     if got_season is not None and got_season != season:
         raise SeasonNotAvailable(f"Feed returned season {got_season}, expected {season}")
 
+    entries = _entries(payload)
+    if not entries:
+        raise SeasonNotAvailable("Feed has no team entries yet")
+    if all(_stat(e.get("stats") or [], "wins") is None for e in entries):
+        raise SeasonNotAvailable("Feed lists teams but no records yet")
+
     rows: dict[str, StandingRow] = {}
-    for entry in _entries(payload):
+    for entry in entries:
         team = entry.get("team") or {}
         raw_id = str(team.get("abbreviation", "")).upper()
         team_id = ESPN_ALIASES.get(raw_id, raw_id)
