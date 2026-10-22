@@ -85,6 +85,18 @@ def reported_season_type(payload: dict) -> int | None:
     return None
 
 
+def max_plausible_diff(games: int) -> float:
+    """Largest believable average margin. One blowout can top 40 (the NBA record is 73),
+    but over a long stretch no team has averaged more than about 15."""
+    if games <= 0:
+        return 0.0
+    if games < 5:
+        return 75.0
+    if games < 20:
+        return 35.0
+    return 25.0
+
+
 def parse_standings(payload: dict, known_ids: set[str], season: int = SEASON) -> list[StandingRow]:
     """Convert ESPN's JSON into one row per team. Raises ValueError if anything looks wrong."""
     got_season = reported_season(payload)
@@ -133,8 +145,10 @@ def parse_standings(payload: dict, known_ids: set[str], season: int = SEASON) ->
     for r in rows.values():
         if r.w + r.l > 82 or r.w < 0 or r.l < 0:
             raise ValueError(f"{r.id}: impossible record {r.w}-{r.l}")
-        if abs(r.point_diff) > 40:
-            raise ValueError(f"{r.id}: point differential {r.point_diff} per game is not plausible")
+        limit = max_plausible_diff(r.w + r.l)
+        if abs(r.point_diff) > limit:
+            raise ValueError(f"{r.id}: point differential {r.point_diff} per game is not plausible "
+                             f"after {r.w + r.l} games (limit {limit})")
     total_w, total_l = sum(r.w for r in rows.values()), sum(r.l for r in rows.values())
     if total_w != total_l:
         raise ValueError(f"League wins ({total_w}) and losses ({total_l}) don't match")

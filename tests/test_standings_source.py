@@ -67,6 +67,17 @@ def test_wrong_season_is_flagged():
         parse_standings(feed({}, season=2026), KNOWN)
 
 
+def test_early_season_blowout_is_accepted():
+    # Raptors 135, Bulls 92 on Oct 21, 2026: a real 43-point game
+    rows = {r.id: r for r in parse_standings(feed({"TOR": (1, 0, 135.0, 92.0), "CHI": (0, 1, 92.0, 135.0)}), KNOWN)}
+    assert rows["CHI"].point_diff == -43.0
+
+
+def test_implausible_margin_later_in_season_is_rejected():
+    with pytest.raises(ValueError, match="not plausible"):
+        parse_standings(feed({"TOR": (25, 0, 140.0, 100.0), "CHI": (0, 25, 100.0, 140.0)}), KNOWN)
+
+
 def test_preseason_records_are_not_used():
     with pytest.raises(SeasonNotAvailable, match="preseason"):
         parse_standings(feed({"BOS": (4, 0, 115.0, 100.0)}, season_type=1), KNOWN)
