@@ -30,6 +30,11 @@
     try {
       const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
       if (!s) return;
+      // Model settings carry over between visits
+      SLIDERS.concat(["simSel"]).forEach((k) => { if (s[k] != null) $(k).value = s[k]; });
+      // Edits to the data only apply to the data they were made on. Once the daily pipeline
+      // publishes newer standings, the visitor sees the new data instead of their old copy.
+      if (s.dataVersion !== DATA.asOf) return;
       if (Array.isArray(s.teams)) s.teams.forEach((x) => {
         const t = teams.find((t) => t.id === x.id);
         if (t) TEAM_FIELDS.forEach(([f]) => { if (x[f] != null && !isNaN(+x[f])) t[f] = +x[f]; });
@@ -37,12 +42,12 @@
       const known = (j) => teams.some((t) => t.id === j.team);
       if (Array.isArray(s.injuries)) injuries = s.injuries.filter(known);
       if (Array.isArray(s.moves)) moves = s.moves.filter(known);
-      SLIDERS.concat(["asof", "simSel"]).forEach((k) => { if (s[k] != null) $(k).value = s[k]; });
+      if (s.asof != null) $("asof").value = s.asof;
     } catch (e) { /* storage unavailable: use repo data */ }
   }
   function save() {
     try {
-      const s = { teams, injuries, moves };
+      const s = { dataVersion: DATA.asOf, teams, injuries, moves };
       SLIDERS.concat(["asof", "simSel"]).forEach((k) => { s[k] = $(k).value; });
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
     } catch (e) { /* ignore */ }
