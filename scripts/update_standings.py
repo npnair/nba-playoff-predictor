@@ -91,8 +91,8 @@ def main() -> int:
     print(f"Wrote {STANDINGS.relative_to(ROOT)}: {games} games played league-wide")
 
     now = datetime.now(ZoneInfo("America/Los_Angeles"))
-    # A morning run reflects the previous night's games
-    today = (now - timedelta(days=1)).date() if now.hour < 12 else now.date()
+    # NBA games end by about 10 PM Pacific, so any earlier run reflects the previous night's games
+    today = (now - timedelta(days=1)).date() if now.hour < 22 else now.date()
     label = f"Standings through {today:%b} {today.day}, {today.year}"
     py = sys.executable
     subprocess.run([py, str(ROOT / "scripts" / "build_web_data.py"), "--as-of", label], check=True, cwd=ROOT)
