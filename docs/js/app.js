@@ -128,12 +128,26 @@
     $("injStat").textContent = injuries.length;
   }
 
+  // Same data, same settings -> same simulated seasons, so the bracket doesn't reshuffle on reload
+  function seededRandom(text) {
+    let h = 2166136261;
+    for (const ch of String(text)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    let a = h >>> 0;
+    return () => {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   function run() {
     const btn = $("runBtn");
     btn.disabled = true;
     btn.textContent = "Simulating…";
     requestAnimationFrame(() => setTimeout(() => {
-      results = M.simulate(teams, injuries, moves, settings());
+      results = M.simulate(teams, injuries, moves, settings(), seededRandom(DATA.asOf));
       $("simStat").textContent = (+$("simSel").value).toLocaleString();
       render();
       window.dispatchEvent(new CustomEvent("pl:results", { detail: { teams, injuries, results } }));
