@@ -904,5 +904,7 @@ window.PL_DATA = {
    "move": "- Dean Wade",
    "impact": -0.5
   }
- ]
+ ],
+ "games": [],
+ "players": []
 };

@@ -46,6 +46,8 @@ def main() -> None:
                    help="games of evidence the preseason rating counts for (default 25)")
     p.add_argument("--data-dir", type=Path, default=DATA_DIR, help="folder holding the CSV inputs")
     p.add_argument("--out", type=Path, default=None, help="optional CSV file for the full results")
+    p.add_argument("--bracket", action="store_true",
+                   help="also print the predicted playoff bracket (needs data/games.csv and data/players.csv)")
     p.add_argument("--history", type=Path, default=None,
                    help="optional CSV to append one row per team for this run, to track odds over time")
     p.add_argument("--date", default=None, help="date to record in --history (default today, YYYY-MM-DD)")
@@ -70,9 +72,45 @@ def main() -> None:
             writer.writerows(sorted(results, key=lambda r: (r["conference"], r["avg_seed"])))
         print(f"\nWrote {args.out}")
 
+    if args.bracket:
+        print_bracket(teams, injuries, moves, settings, results)
+
     if args.history:
         append_history(args.history, args.date or date.today().isoformat(), results)
         print(f"Updated {args.history}")
+
+
+def print_bracket(teams, injuries, moves, settings, results) -> None:
+    from .data_io import load_games, load_players
+    from .model import injury_penalties, team_ratings
+    from .playoffs import Context, full_bracket, out_for_playoffs
+
+    players, games = load_players(), load_games()
+    if not players:
+        print("\nNo player data yet (data/players.csv); run scripts/update_standings.py first.")
+        return
+    rating, _, _ = team_ratings(teams, moves, settings)
+    pen = injury_penalties(teams, injuries)
+    ratings = {t.id: float(rating[i] - pen[i, t.games_left]) for i, t in enumerate(teams)}
+    left = {t.id: t.games_left for t in teams}
+    ctx = Context(ratings, players, games, out_for_playoffs(players, injuries, left))
+    seeds = {c: [r["id"] for r in sorted((r for r in results if r["conference"] == c), key=lambda r: r["avg_seed"])][:10]
+             for c in CONFERENCES}
+    wins = {r["id"]: r["proj_wins"] for r in results}
+    b = full_bracket(ctx, seeds["West"], seeds["East"], wins)
+
+    def line(s, indent="  "):
+        return f"{indent}{s['winner']} over {s['loser']} in {s['games']} ({s['prob']:.0%})"
+    for conf in CONFERENCES:
+        c = b[conf]
+        print(f"\n{conf.upper()} PLAYOFFS")
+        g78, g910, last = c["play_in"]
+        print(f"  Play-in: {g78['winner']} beats {g78['loser']}, {g910['winner']} beats {g910['loser']}, "
+              f"{last['winner']} beats {last['loser']} for the 8 seed")
+        print("  First round:"); [print(line(s, "    ")) for s in c["r1"]]
+        print("  Second round:"); [print(line(s, "    ")) for s in c["r2"]]
+        print("  Conference finals:"); print(line(c["final"], "    "))
+    print("\nNBA FINALS"); print(line(b["finals"]))
 
 
 HISTORY_FIELDS = ["date", "id", "conference", "record", "proj_wins", "avg_seed", "top6", "play_in", "playoffs"]

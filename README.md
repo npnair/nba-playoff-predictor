@@ -6,6 +6,7 @@ It runs two ways from the same data:
 
 - **Python command line** (`python -m predictor`) for repeatable runs and CSV output
 - **Interactive web page** in `docs/` that you can host free on GitHub Pages, with sliders, editable injuries and roster moves, and live re-simulation in the browser
+- **Playoff bracket** tab that predicts every series, its winner and its length, from the same simulation
 
 ```
 WESTERN CONFERENCE
@@ -28,6 +29,24 @@ WESTERN CONFERENCE
 5. **Seed and play in.** Teams are ranked by wins in each conference. Seeds 7 vs 8 and 9 vs 10 play, then the 7/8 loser hosts the 9/10 winner for the final playoff spot.
 
 The output for each team is projected wins, the chance of a top 6 seed, the chance of landing in the play-in, and the overall chance of making the playoffs (top 6 or winning the play-in). Teams that have mathematically locked up a top 6 seed are marked clinched, and teams that can no longer reach the top 10 are marked eliminated (tiebreakers ignored).
+
+## Playoff bracket
+
+The second tab on the site fills out the full playoff bracket, play-in through the Finals. A series pick isn't simply the higher seed. Each matchup's expected margin (points per game on a neutral court) blends three estimates:
+
+| Factor | Weight | What it measures |
+|---|---|---|
+| Team strength | 50% | Each team's rating from the standings model, after injuries that last into the playoffs |
+| Starting five | 30% | The five most-played healthy players on each side, lined up PG to C and compared slot by slot on Box Plus/Minus, counted at 36 playoff minutes |
+| Season series | 20% | The two teams' head-to-head results this season, adjusted for home court and blended with 4 games' worth of team strength because the sample is small |
+
+The combined edge sets every game's win probability, with 2.5 points of home court in the 2-2-1-1-1 format. Playing out every possible best-of-seven gives the chance of each result (4-0 through 0-4); the bracket shows the favorite and their most likely number of games. Clicking any series shows the factor breakdown, all eight outcomes, the position-by-position matchups and the season's games between the two teams.
+
+Player numbers blend this season with last season (this season counts half once a player has 10 games) and are shrunk toward replacement level by minutes played, so a hot first week doesn't swing a lineup. Seeds come from the standings simulation, and the browser recomputes the bracket whenever the inputs change. `predictor/playoffs.py` and `docs/js/playoffs.js` implement the same model, and a test checks that they produce identical brackets.
+
+```bash
+python -m predictor --bracket   # print the predicted bracket in the terminal
+```
 
 ## Quick start
 
@@ -66,6 +85,7 @@ ESPN standings feed ──► validate ──► data/standings.csv ──► ru
 1. **Extract.** Every morning at about 4 AM Pacific, `scripts/update_standings.py` pulls the league standings from ESPN's public JSON feed (no API key needed).
 2. **Validate.** The feed is unofficial, so the run stops without writing anything if any team is missing or unrecognized, a record is impossible, league wins and losses don't balance, a point differential is implausible, or a team's record went backwards since the last run.
 3. **Transform and load.** ESPN team codes are mapped to the project's (for example `GS` to `GSW`), point differential per game is computed from points for and against, and `data/standings.csv` is rewritten.
+   The same run refreshes the bracket's inputs from Basketball-Reference (about 38 requests, paced to its limit of 20 a minute): every game's result (`data/games.csv`), each team's current roster, and player minutes and Box Plus/Minus (`data/players.csv`). If any of these fail, the last good file is kept and the standings update still goes through.
 4. **Model and publish.** The model reruns with a date-based seed so results are reproducible. The web page's data, the latest projections and a running history of every team's odds are refreshed, the tests run on the new data, and the changes are committed.
 
 If there were no games since the last run, nothing is committed. If the feed fails validation, the run shows a red X in the Actions tab and the last good data stays in place. You can also start a run by hand from **Actions → update standings → Run workflow**.
@@ -82,6 +102,7 @@ Injuries and roster moves need judgment, so they are not automated. All inputs a
 | `injuries.csv` | Player, impact in points, games still out | Weekly, as players return or get hurt |
 | `moves.csv` | Offseason and in-season roster changes with impact in points | After trades |
 | `teams.csv` | Names, conferences, win totals, 2025–26 record and net rating, preseason record | Once per season |
+| `games.csv`, `players.csv` | Game results and rostered players' stats for the bracket | Automatic, daily |
 
 After editing a CSV, rebuild the web page's data so both versions agree:
 
@@ -100,6 +121,8 @@ nba-playoff-predictor/
 │   ├── data_io.py           load and validate the CSVs
 │   ├── model.py             ratings, injuries, season simulation, play-in, clinch logic
 │   ├── standings_source.py  fetch and validate the ESPN standings feed
+│   ├── playoffs.py          bracket model: starting fives, season series, best-of-seven odds
+│   ├── bref.py              Basketball-Reference schedule, player stats and roster pages
 │   └── __main__.py          command line interface
 ├── scripts/
 │   ├── update_standings.py  the daily pipeline: fetch, validate, write, rerun model
@@ -108,7 +131,7 @@ nba-playoff-predictor/
 ├── docs/                    the web app (GitHub Pages serves this folder)
 │   ├── index.html
 │   ├── css/styles.css
-│   └── js/                  data.js (generated), model.js (same model as Python), app.js (UI)
+│   └── js/                  data.js (generated), model.js and playoffs.js (same models as Python), app.js and bracket.js (UI)
 ├── tests/                   model tests and feed parsing/validation tests
 └── .github/workflows/
     ├── tests.yml            runs on every push

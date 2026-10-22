@@ -26,6 +26,12 @@
     </div>
   </header>
 
+  <nav class="tabs" role="tablist" aria-label="Views">
+    <button type="button" role="tab" id="tab-standings" aria-controls="view-standings" aria-selected="true">Standings</button>
+    <button type="button" role="tab" id="tab-bracket" aria-controls="view-bracket" aria-selected="false" tabindex="-1">Playoff bracket</button>
+  </nav>
+
+  <div class="view" id="view-standings" role="tabpanel" aria-labelledby="tab-standings">
   <section class="boards">
     <div class="board" id="board-West"></div>
     <div class="board" id="board-East"></div>
@@ -98,6 +104,33 @@
     <p class="src">Data: 2025–26 net ratings from <a href="https://www.basketball-reference.com/leagues/NBA_2026_ratings.html" target="_blank" rel="noopener">Basketball Reference</a>. Win totals from DraftKings via <a href="https://www.si.com/betting/nba-win-total-predictions-for-every-team-in-2026-27-season-thunder-spurs-only-teams-projected-to-win-60-games" target="_blank" rel="noopener">Sports Illustrated</a> (Oct 15, 2026). Preseason records from <a href="https://basketball.realgm.com/nba/preseason/standings" target="_blank" rel="noopener">RealGM</a>. Injuries from <a href="https://www.covers.com/sport/basketball/nba/injuries" target="_blank" rel="noopener">Covers</a> (Oct 19, 2026). Injury and move impacts are the author's estimates.</p>
   </section>
 
+  </div>
+
+  <div class="view" id="view-bracket" role="tabpanel" aria-labelledby="tab-bracket" hidden>
+    <section class="bracket-intro">
+      <div>
+        <h2>Playoff bracket</h2>
+        <p class="hint">Every series predicted from the standings simulation on the first tab. A series pick isn't just the higher seed: each matchup blends team strength, a position-by-position comparison of the starting fives and the two teams' games against each other this season. Click any series to see why.</p>
+      </div>
+      <div class="champ" id="champ"></div>
+    </section>
+    <section class="bracket-wrap"><div class="bracket" id="bracket"></div></section>
+    <section class="playin" id="playin"></section>
+    <section class="panel series-detail" id="seriesDetail" aria-live="polite"></section>
+    <section class="panel">
+      <h2>How a series is picked</h2>
+      <div class="method">
+        <div><h3>Team strength · 50%</h3><p>Each team's rating from the standings model, after injuries expected to last into the playoffs. It's the best single predictor of who wins a series.</p></div>
+        <div><h3>Starting five · 30%</h3><p>Each team's five most-played healthy players, lined up point guard to center and compared slot by slot on Box Plus/Minus. Rotations shorten in the playoffs, so the starters' edge is counted at 36 minutes a night.</p></div>
+        <div><h3>Season series · 20%</h3><p>The two teams' games against each other this season, adjusted for home court. Three or four games is a small sample, so they're blended with team strength as if team strength were worth four more games.</p></div>
+        <div><h3>Series length</h3><p>The combined edge sets each game's odds, with 2.5 points of home court in a 2-2-1-1-1 format. Playing out every possible series gives the chance of each result, and the bracket shows the winner's most likely number of games.</p></div>
+        <div><h3>Seeding and play-in</h3><p>Seeds follow the projected standings on the first tab. Seeds 7 through 10 go through a single-game play-in decided the same way. The Finals home court goes to the team with more projected wins.</p></div>
+        <div><h3>Limits</h3><p>Player Box Plus/Minus comes from the box score, so it misses some defensive value. Early in the season most player numbers still lean on last season. Change the inputs on the Standings tab and the bracket updates with them.</p></div>
+      </div>
+      <p class="src">Player stats, rosters and game results from <a href="https://www.basketball-reference.com/" target="_blank" rel="noopener">Basketball-Reference</a>, updated each morning.</p>
+    </section>
+  </div>
+
   <footer class="foot">
     <span>Playoff Line 2027 · open source on GitHub</span>
     <span>Not affiliated with the NBA. For fun and analysis, not betting advice.</span>
@@ -106,6 +139,8 @@
 
 <script src="js/data.js"></script>
 <script src="js/model.js"></script>
+<script src="js/playoffs.js"></script>
 <script src="js/app.js"></script>
+<script src="js/bracket.js"></script>
 </body>
 </html>

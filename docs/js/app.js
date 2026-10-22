@@ -136,6 +136,7 @@
       results = M.simulate(teams, injuries, moves, settings());
       $("simStat").textContent = (+$("simSel").value).toLocaleString();
       render();
+      window.dispatchEvent(new CustomEvent("pl:results", { detail: { teams, injuries, results } }));
       btn.disabled = false;
       btn.textContent = "Simulate season";
       save();

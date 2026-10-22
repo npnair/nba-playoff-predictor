@@ -124,3 +124,25 @@ def load_all(data_dir: Path = DATA_DIR) -> tuple[list[Team], list[Injury], list[
     teams, injuries, moves = load_teams(data_dir), load_injuries(data_dir), load_moves(data_dir)
     validate(teams, injuries, moves)
     return teams, injuries, moves
+
+
+# ------------------------------------------------------------------ playoff bracket inputs
+def load_games(data_dir: Path = DATA_DIR) -> list[dict]:
+    """Every 2026-27 game: date, home, away, and scores (blank until played)."""
+    path = data_dir / "games.csv"
+    if not path.exists():
+        return []
+    def score(v: str) -> int | None:
+        return int(float(v)) if v not in ("", None) else None
+    return [{"date": r["date"], "home": r["home"], "away": r["away"],
+             "home_pts": score(r["home_pts"]), "away_pts": score(r["away_pts"])} for r in _rows(path)]
+
+
+def load_players(data_dir: Path = DATA_DIR) -> list[dict]:
+    """Rostered players with blended minutes per game and Box Plus/Minus (see predictor/playoffs.py)."""
+    path = data_dir / "players.csv"
+    if not path.exists():
+        return []
+    return [{"team": r["team"], "bref_id": r["bref_id"], "player": r["player"], "pos": r["pos"],
+             "mpg": float(r["mpg"]), "bpm": float(r["bpm"]), "minutes": int(float(r["minutes"]))}
+            for r in _rows(path)]
