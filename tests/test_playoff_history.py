@@ -15,6 +15,13 @@ def test_shifts_are_centered_on_the_seasons_average_dip():
     assert s["a"] == pytest.approx(1.0) and s["b"] == pytest.approx(-1.0)
 
 
+def test_stars_are_not_punished_for_normal_regression():
+    # everyone's playoff BPM is half their regular season BPM: nobody is a riser or a faller
+    regular = [row(p, b, 2500) for p, b in (("star", 10), ("mid", 2), ("low", -2), ("bench", -4))]
+    playoffs = [row(p, b / 2, 500) for p, b in (("star", 10), ("mid", 2), ("low", -2), ("bench", -4))]
+    assert all(abs(x["shift"]) < 1e-9 for x in season_shifts(regular, playoffs))
+
+
 def test_players_without_a_regular_season_row_are_skipped():
     assert season_shifts([row("a", 1, 100)], [row("z", 3, 100)]) == []
 

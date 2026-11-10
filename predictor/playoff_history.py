@@ -1,9 +1,11 @@
 """How much better or worse each player has played in past playoffs than in the regular season.
 
-For every postseason in the window, a player's shift is his playoff Box Plus/Minus minus his
-regular season BPM that same year. Playoff opponents are tougher, so most players dip; each season's
-shifts are centered on that season's minutes-weighted average dip, which leaves only the part that is
-specific to the player (a "riser" plays above the usual playoff level, a "faller" below it).
+For every postseason in the window, a player's playoff Box Plus/Minus is compared with what players
+at his regular season level typically did in that postseason (a minutes-weighted line fit through
+everyone's regular season and playoff BPM). Being above the line makes him a "riser", below a
+"faller". Comparing to the line rather than to his own regular season number matters for stars:
+an extreme regular season BPM tends to come back toward average in any new sample, which would
+otherwise look like a playoff collapse.
 
 Shifts are combined across seasons weighted by playoff minutes, with older postseasons counted less,
 then shrunk toward zero because playoff samples are small and noisy: a player with PRIOR_MINUTES of
@@ -21,7 +23,13 @@ FIELDS = ["bref_id", "player", "seasons", "po_games", "po_minutes", "raw_shift",
 
 
 def season_shifts(regular: list[dict], playoffs: list[dict]) -> list[dict]:
-    """Each playoff player's BPM change that season, centered on the season's average change."""
+    """Each playoff player's BPM compared with what's normal for his regular season level that year.
+
+    A straight playoff-minus-regular difference would punish stars: a very high regular season BPM is
+    partly luck, so the playoff number usually comes in lower even for a player who didn't change.
+    Instead, a minutes-weighted line is fit through (regular BPM, playoff BPM) for everyone that
+    season, and a player's shift is how far his playoff BPM sits above or below that line.
+    """
     reg = {p["bref_id"]: p for p in regular if p.get("bpm") is not None}
     rows = []
     for p in playoffs:
@@ -29,11 +37,17 @@ def season_shifts(regular: list[dict], playoffs: list[dict]) -> list[dict]:
         if r is None or p.get("bpm") is None or (p.get("mp") or 0) <= 0:
             continue
         rows.append({"bref_id": p["bref_id"], "player": p["player"], "mp": p["mp"], "g": p.get("g") or 0,
-                     "diff": p["bpm"] - r["bpm"]})
+                     "reg": r["bpm"], "po": p["bpm"]})
     total = sum(x["mp"] for x in rows)
-    mean = sum(x["mp"] * x["diff"] for x in rows) / total if total else 0.0
+    if not total:
+        return []
+    mean_reg = sum(x["mp"] * x["reg"] for x in rows) / total
+    mean_po = sum(x["mp"] * x["po"] for x in rows) / total
+    var = sum(x["mp"] * (x["reg"] - mean_reg) ** 2 for x in rows)
+    cov = sum(x["mp"] * (x["reg"] - mean_reg) * (x["po"] - mean_po) for x in rows)
+    slope = cov / var if var > 1e-9 else 1.0
     for x in rows:
-        x["shift"] = x["diff"] - mean
+        x["shift"] = x["po"] - (mean_po + slope * (x["reg"] - mean_reg))
     return rows
 
 
