@@ -1,34 +1,64 @@
 team,player,impact,games_out
-GSW,"Jimmy Butler III (ACL, Jan–Feb)",3.0,45
-GSW,"Kristaps Porzingis (illness, indefinite)",1.5,20
-GSW,"Moses Moody (patellar tendon, Dec–Jan)",0.8,30
-POR,"Shaedon Sharpe (meniscus, ~late Feb)",2.0,55
-PHX,"Mark Williams (shoulder, ~Feb)",1.5,50
-MIN,"Donte DiVincenzo (Achilles, midseason)",1.0,45
-DAL,"Dereck Lively II (foot, unclear)",1.5,20
-DAL,"Santi Aldama (knee, no timeline)",0.8,15
-LAC,"Bradley Beal (knee, misses start)",1.5,10
-LAC,Max Strus (plantar fascia),0.8,6
-LAC,Jordan Miller (rotator cuff),0.3,50
-CHA,"Kon Knueppel (hamstring, questionable)",2.5,2
-CHA,Grant Williams (hamstring),0.8,4
-CHI,Nic Claxton (hamstring),1.0,2
-DEN,"Julian Strawther (knee, ~6 wks)",0.5,15
-MIA,Dru Smith (calf),0.5,6
-MEM,I. Stewart (ankle),0.8,2
-ORL,"Franz Wagner (shoulder, day to day)",2.0,1
-ORL,Noah Penda (hamstring),0.3,15
-PHI,Dominick Barlow (back),0.3,10
-PHI,"Adem Bona (foot, day to day)",0.5,2
-PHI,"Ariel Hukporti (Achilles, season)",0.2,82
-SAC,Maxime Raynaud (knee),1.0,6
-SAC,"Ben Simmons (Achilles, season)",0.3,82
-SAC,Dylan Cardwell (calf),0.3,3
-UTA,Jusuf Nurkic (foot),1.0,8
-WAS,"A.J. Dybantsa (ankle, day to day)",2.0,1
-WAS,Tristan Vukcevic (hip),0.3,6
-WAS,"J. Watkins (ACL, season)",0.3,82
-ATL,Mouhamed Gueye (foot),0.8,10
 ATL,"Henri Veesaar (ACL, season)",0.3,82
+ATL,"Mouhamed Gueye (foot fracture, ~Nov 20)",0.6,5
+ATL,"Asa Newell (toe, day to day)",0.3,2
+BKN,"Egor Demin (out, no timeline)",0.5,2
+CHA,"Kon Knueppel (hamstring, re-eval ~Dec 8)",2.5,13
+CHA,"Dennis Schroder (hamstring, re-eval ~Nov 22)",0.8,6
+CHA,"Brandon Miller (hip, day to day)",1.5,2
+CHA,Grant Williams (hamstring),0.8,2
+CLE,Sam Merrill (elbow),0.5,2
+CLE,Jaylon Tyson (ankle),0.5,2
+DAL,"Dereck Lively II (foot, unclear)",1.5,5
+DEN,"Julian Strawther (knee, ~late Nov)",0.5,9
+DET,"Jalen Duren (hamstring, re-eval ~Nov 22)",2.0,6
+DET,"Isaiah Joe (hip, ~Nov 17)",0.8,3
+GSW,"Jimmy Butler III (ACL, Jan–Feb)",3.0,31
+GSW,"Kristaps Porzingis (stepped away, indefinite)",1.5,25
+GSW,"Moses Moody (patellar tendon, Dec–Jan)",0.8,19
+GSW,"Will Richard (thumb UCL tear, indefinite)",0.5,24
+HOU,"Steven Adams (calf, no timetable)",0.8,5
+HOU,Clint Capela (ankle),0.5,2
+IND,"Tyrese Haliburton (hamstring, no timetable)",3.0,4
+IND,"Ben Sheppard (meniscus surgery, months)",0.3,25
+IND,"Johnny Furphy (ACL, rehab)",0.3,25
+LAC,"Brandon Ingram (Achilles/heel, unclear)",1.5,3
+LAC,"Bradley Beal (knee, ~late Nov)",1.0,9
+LAC,"Jordan Miller (rotator cuff, ~Mar)",0.3,53
+LAC,"Isaiah Jackson (groin, day to day)",0.3,1
+MEM,Scotty Pippen Jr. (lumbar disc),0.5,3
+MEM,Isaiah Stewart (knee bone bruise),0.8,2
+MIN,"Anthony Edwards (knee scope, ~late Dec)",3.5,19
+MIN,"Donte DiVincenzo (Achilles, ~Apr)",1.0,67
+NOP,Trey Murphy III (knees),1.5,2
+NOP,"Yves Missi (knee bone bruise, ~Nov 16)",0.5,3
+OKC,"Chet Holmgren (patellar tendon, 8–10 wks)",2.5,25
+OKC,"Jalen Williams (leg fracture, ~Mar)",2.0,53
+OKC,"Cason Wallace (shoulder surgery, ~Mar)",1.0,53
+OKC,Thomas Sorber (knee),0.3,2
 OKC,"Otega Oweh (Achilles, season)",0.3,82
-IND,"Johnny Furphy (ACL, season)",0.3,82
+ORL,"Paolo Banchero (high ankle, ~Nov 22)",2.5,6
+ORL,"Jalen Suggs (knee bone bruise, re-eval)",1.2,3
+ORL,"Noah Penda (hamstring, ~Nov 18)",0.3,4
+ORL,Jonathan Isaac (knee),0.3,2
+PHI,"Dominick Barlow (back, ~Nov 18)",0.3,4
+PHI,Adem Bona (back),0.5,1
+PHI,"Ariel Hukporti (Achilles, season)",0.2,82
+PHX,"Mark Williams (shoulder, ~Feb)",1.5,40
+POR,"Ja Morant (hamstring, ~Dec 1)",1.5,10
+POR,"Vit Krejci (leg fracture, ~Jan)",0.5,25
+POR,"Shaedon Sharpe (meniscus, ~Mar)",2.0,53
+SAC,Maxime Raynaud (knee),1.0,2
+SAC,"Ben Simmons (Achilles, season)",0.3,82
+SAS,"Jayden Quaintance (knee surgery, ~Dec)",0.3,11
+SAS,Tobias Harris (calf),0.8,2
+SAS,"Devin Vassell (groin, day to day)",1.0,1
+TOR,"Kawhi Leonard (knee swelling, re-eval)",3.0,6
+TOR,Nate Bittle (avulsion fracture),0.5,2
+TOR,"Scottie Barnes (groin, day to day)",2.5,1
+UTA,"Jaren Jackson Jr. (MCL, 6–8 wks)",1.5,16
+UTA,"Jusuf Nurkic (foot, re-eval ~Nov 20)",1.0,5
+WAS,"Reece Beekman (AC joint, ~Dec 3)",0.3,11
+WAS,"Justin Champagnie (foot, months)",0.5,50
+WAS,"Tristan Vukcevic (hip, ~Nov 16)",0.3,3
+WAS,"Jamir Watkins (ACL, ~Apr)",0.3,67
