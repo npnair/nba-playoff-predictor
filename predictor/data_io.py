@@ -138,11 +138,23 @@ def load_games(data_dir: Path = DATA_DIR) -> list[dict]:
              "home_pts": score(r["home_pts"]), "away_pts": score(r["away_pts"])} for r in _rows(path)]
 
 
+def load_playoff_history(data_dir: Path = DATA_DIR) -> dict[str, float]:
+    """{bref_id: playoff_adj}, how much better or worse each player has been in past playoffs
+    (see predictor/playoff_history.py). Empty until the pipeline first fetches it."""
+    path = data_dir / "playoff_history.csv"
+    if not path.exists():
+        return {}
+    return {r["bref_id"]: float(r["playoff_adj"]) for r in _rows(path) if r.get("playoff_adj") not in ("", None)}
+
+
 def load_players(data_dir: Path = DATA_DIR) -> list[dict]:
-    """Rostered players with blended minutes per game and Box Plus/Minus (see predictor/playoffs.py)."""
+    """Rostered players with blended minutes per game, Box Plus/Minus (see predictor/playoffs.py) and
+    their playoff adjustment (0 for players with no playoff history)."""
     path = data_dir / "players.csv"
     if not path.exists():
         return []
+    adj = load_playoff_history(data_dir)
     return [{"team": r["team"], "bref_id": r["bref_id"], "player": r["player"], "pos": r["pos"],
-             "mpg": float(r["mpg"]), "bpm": float(r["bpm"]), "minutes": int(float(r["minutes"]))}
+             "mpg": float(r["mpg"]), "bpm": float(r["bpm"]), "minutes": int(float(r["minutes"])),
+             "po_adj": adj.get(r["bref_id"], 0.0)}
             for r in _rows(path)]

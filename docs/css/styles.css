@@ -185,6 +185,7 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.82rem}
 .pos .edge{font-family:var(--mono);font-size:.8rem}
 .pos .edge.a{color:var(--ball)} .pos .edge.b{color:var(--playin)}
 .pos .pl{max-width:12em;overflow:hidden;text-overflow:ellipsis}
+.pos .adj{display:block;font-size:.66rem;line-height:1.1} .pos .adj.up{color:var(--good)} .pos .adj.down{color:var(--bad)}
 .games-list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .games-list li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding-top:4px}
 .games-list .d{font-family:var(--mono);font-size:.78rem;color:var(--muted)}

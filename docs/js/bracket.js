@@ -9,7 +9,8 @@
   const signed = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
   const games = (DATA.games || []).map(([date, home, away, home_pts, away_pts]) => ({ date, home, away, home_pts, away_pts }));
-  const players = (DATA.players || []).map(([team, bref_id, player, pos, mpg, bpm, minutes]) => ({ team, bref_id, player, pos, mpg, bpm, minutes }));
+  const players = (DATA.players || []).map(([team, bref_id, player, pos, mpg, bpm, minutes, po_adj]) => ({ team, bref_id, player, pos, mpg, bpm, minutes, po_adj: po_adj || 0 }));
+  const hasPlayoffHistory = players.some((p) => p.po_adj);
 
   let state = null;          // { bracket, teamsById, seedOf }
   let selected = "finals";
@@ -164,7 +165,7 @@
 
     const factors = `
       ${factor("Team strength", Math.round(W.rating * 100) + "%", s.ratingGap, a, b, "Gap in team rating from the standings model, after injuries.")}
-      ${factor("Starting five", Math.round(W.lineup * 100) + "%", s.lineupGap, a, b, `${esc(s.slotsWon >= 3 ? a : b)} wins ${Math.max(s.slotsWon, s.slots.length - s.slotsWon)} of ${s.slots.length} position matchups.`)}
+      ${factor("Starting five", Math.round(W.lineup * 100) + "%", s.lineupGap, a, b, `${esc(s.slotsWon >= 3 ? a : b)} wins ${Math.max(s.slotsWon, s.slots.length - s.slotsWon)} of ${s.slots.length} position matchups${hasPlayoffHistory ? ", using each player's past playoff form" : ""}.`)}
       ${factor("Season series", Math.round(W.h2h * 100) + "%", s.h2h, a, b, h2hNote)}
       <div class="factor total"><span class="lbl">Combined edge</span>
         <span class="val">${Math.abs(s.margin) < 0.05 ? "even" : `${esc(s.margin >= 0 ? a : b)} by ${Math.abs(s.margin).toFixed(1)} pts a game`}</span>
@@ -180,14 +181,20 @@
         <span class="res"><b>${esc(id)}</b>4-${g - 4}</span></div>`).join("")}</div></div>`;
     }
 
+    // Playoff BPM, with the playoff-history part shown underneath when it moves the number
+    const bpmCell = (p) => {
+      const adj = p.po_adj || 0, show = Math.abs(adj) >= 0.05;
+      const tip = `Season BPM ${signed(p.bpm)}${show ? `, past playoffs ${signed(adj)}` : ", no playoff adjustment"}`;
+      return `<td class="num mono" title="${tip}">${signed(PO.playoffBpm(p))}${show ? `<small class="adj ${adj > 0 ? "up" : "down"}">${adj > 0 ? "▲" : "▼"}${Math.abs(adj).toFixed(1)}</small>` : ""}</td>`;
+    };
     const posRows = s.slots.map((x) => `<tr><td>${x.slot}</td>
-      <td class="pl" title="${esc(x.a.player)}">${esc(x.a.player)}</td><td class="num mono">${signed(x.a.bpm)}</td>
-      <td class="pl" title="${esc(x.b.player)}">${esc(x.b.player)}</td><td class="num mono">${signed(x.b.bpm)}</td>
+      <td class="pl" title="${esc(x.a.player)}">${esc(x.a.player)}</td>${bpmCell(x.a)}
+      <td class="pl" title="${esc(x.b.player)}">${esc(x.b.player)}</td>${bpmCell(x.b)}
       <td class="num edge ${x.edge >= 0 ? "a" : "b"}">${Math.abs(x.edge) < 0.05 ? "even" : `${esc(x.edge >= 0 ? a : b)} ${signed(Math.abs(x.edge))}`}</td></tr>`).join("");
     const positions = s.slots.length ? `<div><h3>Position by position</h3>
       <div class="scroll"><table class="pos"><thead><tr><th>Pos</th><th>${esc(a)}</th><th class="num">BPM</th><th>${esc(b)}</th><th class="num">BPM</th><th class="num">Edge</th></tr></thead>
       <tbody>${posRows}</tbody></table></div>
-      <p class="empty-note" style="margin-top:6px">Box Plus/Minus: points per 100 possessions above an average player. Small samples are pulled toward replacement level.</p></div>` : "";
+      <p class="empty-note" style="margin-top:6px">Box Plus/Minus: points per 100 possessions above an average player. Small samples are pulled toward replacement level.${hasPlayoffHistory ? " ▲/▼ shows how much better or worse the player has been in his last five postseasons than in the regular season, already included in the number." : ""}</p></div>` : "";
 
     const gamesList = s.played.length ? `<div><h3>This season</h3><ul class="games-list">${s.played.map((g) =>
       `<li><span class="d">${esc(g.date)}</span><span>${esc(g.away)} ${g.away_pts} @ ${esc(g.home)} ${g.home_pts}</span></li>`).join("")}</ul></div>` : "";

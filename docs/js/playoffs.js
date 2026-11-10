@@ -41,7 +41,9 @@
     pool.sort((a, b) => posNumber(a.pos) - posNumber(b.pos) || b.mpg - a.mpg);
     return pool.map((p, k) => ({ ...p, slot: SLOTS[k] }));
   }
-  const lineupValue = (five) => five.reduce((s, p) => s + p.bpm, 0) * STARTER_MINUTES / 48;
+  // Regular season BPM plus how the player has done in past playoffs (0 with no playoff history)
+  const playoffBpm = (p) => p.bpm + (p.po_adj || 0);
+  const lineupValue = (five) => five.reduce((s, p) => s + playoffBpm(p), 0) * STARTER_MINUTES / 48;
 
   // ---------- season series ----------
   function seasonSeries(games, a, b) {
@@ -74,7 +76,7 @@
     const { played, scheduled } = seasonSeries(ctx.games, a, b);
     const h2h = h2hEstimate(played, ratingGap);
     const margin = WEIGHTS.rating * ratingGap + WEIGHTS.lineup * lineupGap + WEIGHTS.h2h * h2h;
-    const slots = SLOTS.map((slot, k) => fa[k] && fb[k] ? { slot, a: fa[k], b: fb[k], edge: fa[k].bpm - fb[k].bpm } : null).filter(Boolean);
+    const slots = SLOTS.map((slot, k) => fa[k] && fb[k] ? { slot, a: fa[k], b: fb[k], edge: playoffBpm(fa[k]) - playoffBpm(fb[k]) } : null).filter(Boolean);
     return { a, b, ratingGap, lineupGap, h2h, margin, slots, played, scheduled,
              slotsWon: slots.filter((s) => s.edge > 0).length };
   }
@@ -143,7 +145,7 @@
 
   global.PL_PLAYOFFS = {
     WEIGHTS, SLOTS, HOME_COURT, posNumber, normalize, injuryName, matchesInjury, outForPlayoffs, startingFive,
-    lineupValue, seasonSeries, h2hEstimate, makeContext, matchup, gameProb, seriesOutcomes, seriesPick,
+    playoffBpm, lineupValue, seasonSeries, h2hEstimate, makeContext, matchup, gameProb, seriesOutcomes, seriesPick,
     playSeries, playGame, conferenceBracket, fullBracket,
   };
 })(typeof window !== "undefined" ? window : globalThis);

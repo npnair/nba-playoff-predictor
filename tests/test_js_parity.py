@@ -20,7 +20,8 @@ def fixture():
     ratings = {t: round(7 - (i % 10) * 1.3 + (0.4 if t[0] == "E" else 0), 2) for i, t in enumerate(teams)}
     positions = ["PG", "SG", "SF", "PF", "C", "SG-PG", "F", "C", "G"]
     players = [{"team": t, "bref_id": f"{t}p{k}", "player": f"Player {t} {k}", "pos": positions[k],
-                "mpg": 36 - 3 * k, "bpm": round(((i * 7 + k * 3) % 11) - 4.5, 2), "minutes": 900}
+                "mpg": 36 - 3 * k, "bpm": round(((i * 7 + k * 3) % 11) - 4.5, 2), "minutes": 900,
+                "po_adj": round(((i * 5 + k) % 7 - 3) * 0.6, 2) if k % 3 else 0.0}
                for i, t in enumerate(teams) for k in range(9)]
     games = [{"date": f"2026-11-{d:02d}", "home": teams[d % 20], "away": teams[(d * 3 + 1) % 20],
               "home_pts": 100 + d % 17, "away_pts": 98 + (d * 5) % 23} for d in range(1, 29)

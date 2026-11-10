@@ -4,7 +4,9 @@ Each matchup's expected margin (points per game on a neutral court) blends three
 
   team strength   50%  the predictor's end-of-season rating, after injuries
   starting five   30%  each team's five starters compared position by position (Box Plus/Minus,
-                       played at 36 minutes a night as playoff rotations tighten)
+                       played at 36 minutes a night as playoff rotations tighten), with each player's
+                       BPM moved up or down by how he has played in past playoffs compared with the
+                       regular season (predictor/playoff_history.py)
   season series   20%  results of the two teams' games against each other, adjusted for home court
                        and blended with team strength until enough games exist (4 games of weight)
 
@@ -111,8 +113,13 @@ def starting_five(players: list[dict], team: str, out: set[str]) -> list[dict]:
     return [{**p, "slot": SLOTS[k]} for k, p in enumerate(pool)]
 
 
+def playoff_bpm(p: dict) -> float:
+    """Regular season BPM plus the player's playoff adjustment (0 with no playoff history)."""
+    return p["bpm"] + (p.get("po_adj") or 0.0)
+
+
 def lineup_value(five: list[dict]) -> float:
-    return sum(p["bpm"] for p in five) * STARTER_MINUTES / 48
+    return sum(playoff_bpm(p) for p in five) * STARTER_MINUTES / 48
 
 
 # ------------------------------------------------------------------ season series
@@ -159,7 +166,7 @@ def matchup(ctx: Context, a: str, b: str) -> dict:
     played, scheduled = season_series(ctx.games, a, b)
     h2h = h2h_estimate(played, rating_gap)
     margin = WEIGHTS["rating"] * rating_gap + WEIGHTS["lineup"] * lineup_gap + WEIGHTS["h2h"] * h2h
-    slots = [{"slot": s, "a": pa, "b": pb, "edge": round(pa["bpm"] - pb["bpm"], 2)}
+    slots = [{"slot": s, "a": pa, "b": pb, "edge": round(playoff_bpm(pa) - playoff_bpm(pb), 2)}
              for s, pa, pb in zip(SLOTS, fa, fb)]
     return {"a": a, "b": b, "rating_gap": rating_gap, "lineup_gap": lineup_gap, "h2h": h2h,
             "margin": margin, "slots": slots, "played": played, "scheduled": scheduled,

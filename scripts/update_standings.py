@@ -31,6 +31,7 @@ STANDINGS = DATA_DIR / "standings.csv"
 GAMES_CSV = DATA_DIR / "games.csv"
 PLAYERS_CSV = DATA_DIR / "players.csv"
 PREV_STATS_CSV = DATA_DIR / "player_stats_2026.csv"
+PLAYOFF_HISTORY_CSV = DATA_DIR / "playoff_history.csv"
 GAME_FIELDS = ["date", "home", "away", "home_pts", "away_pts"]
 PLAYER_FIELDS = ["team", "bref_id", "player", "pos", "mpg", "bpm", "minutes"]
 STAT_FIELDS = ["bref_id", "player", "pos", "g", "mp", "bpm"]
@@ -71,7 +72,7 @@ def refresh_playoff_inputs(season: int) -> bool:
     from predictor import bref
     from predictor.playoffs import build_player_table
 
-    before = {p: p.read_bytes() if p.exists() else b"" for p in (GAMES_CSV, PLAYERS_CSV)}
+    before = {p: p.read_bytes() if p.exists() else b"" for p in (GAMES_CSV, PLAYERS_CSV, PLAYOFF_HISTORY_CSV)}
     try:
         games = sorted(bref.fetch_schedule(season), key=lambda g: (g["date"], g["home"]))
         _write(GAMES_CSV, GAME_FIELDS, games)
@@ -97,7 +98,35 @@ def refresh_playoff_inputs(season: int) -> bool:
     except Exception as e:  # noqa: BLE001
         report(f"Player update failed, keeping saved players: {e}")
 
+    if not PLAYOFF_HISTORY_CSV.exists():                    # past postseasons never change; fetch them once
+        try:
+            refresh_playoff_history(season)
+        except Exception as e:  # noqa: BLE001
+            report(f"Playoff history fetch failed, bracket uses regular season BPM only: {e}")
+
     return any((p.read_bytes() if p.exists() else b"") != before[p] for p in before)
+
+
+def refresh_playoff_history(season: int, pause: float = 3.5) -> None:
+    """Regular season and playoff BPM for the last few postseasons, turned into each player's
+    playoff adjustment (predictor/playoff_history.py). About 10 requests."""
+    import time
+    from predictor import bref
+    from predictor.playoff_history import FIELDS, HISTORY_SEASONS, build_history
+
+    seasons = {}
+    for year in range(season - HISTORY_SEASONS, season):
+        regular = bref.fetch_advanced(year)
+        time.sleep(pause)
+        playoffs = bref.fetch_advanced(year, playoffs=True)
+        time.sleep(pause)
+        if regular and playoffs:
+            seasons[year] = (regular, playoffs)
+    if len(seasons) < HISTORY_SEASONS - 1:
+        raise RuntimeError(f"only {len(seasons)} of {HISTORY_SEASONS} postseasons loaded")
+    rows = build_history(seasons)
+    _write(PLAYOFF_HISTORY_CSV, FIELDS, rows)
+    report(f"Playoff history: {len(rows)} players from {min(seasons)}-{max(seasons)} postseasons", error=False)
 
 
 def main() -> int:

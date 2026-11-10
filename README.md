@@ -37,12 +37,23 @@ The second tab on the site fills out the full playoff bracket, play-in through t
 | Factor | Weight | What it measures |
 |---|---|---|
 | Team strength | 50% | Each team's rating from the standings model, after injuries that last into the playoffs |
-| Starting five | 30% | The five most-played healthy players on each side, lined up PG to C and compared slot by slot on Box Plus/Minus, counted at 36 playoff minutes |
+| Starting five | 30% | The five most-played healthy players on each side, lined up PG to C and compared slot by slot on Box Plus/Minus adjusted for past playoff form, counted at 36 playoff minutes |
 | Season series | 20% | The two teams' head-to-head results this season, adjusted for home court and blended with 4 games' worth of team strength because the sample is small |
 
 The combined edge sets every game's win probability, with 2.5 points of home court in the 2-2-1-1-1 format. Playing out every possible best-of-seven gives the chance of each result (4-0 through 0-4); the bracket shows the favorite and their most likely number of games. Clicking any series shows the factor breakdown, all eight outcomes, the position-by-position matchups and the season's games between the two teams.
 
-Player numbers blend this season with last season (this season counts half once a player has 10 games) and are shrunk toward replacement level by minutes played, so a hot first week doesn't swing a lineup. Seeds come from the standings simulation, and the browser recomputes the bracket whenever the inputs change. `predictor/playoffs.py` and `docs/js/playoffs.js` implement the same model, and a test checks that they produce identical brackets.
+Player numbers blend this season with last season (this season counts half once a player has 10 games) and are shrunk toward replacement level by minutes played, so a hot first week doesn't swing a lineup.
+
+### Playoff form
+
+Some players raise their level in the playoffs and some fade, so each starter's BPM is adjusted by how he has played in his last five postseasons compared with the regular season (`data/playoff_history.csv`, built by `predictor/playoff_history.py`):
+
+1. For each postseason, take his playoff BPM minus his regular season BPM that year.
+2. Playoff defenses are tougher, so almost everyone dips. Subtract that season's average dip (weighted by minutes), which leaves how much better or worse than a typical player he did.
+3. Combine the seasons, weighted by playoff minutes, with each older postseason counting 80% as much as the one after it.
+4. Shrink toward zero, because playoff samples are small and noisy. A player keeps half his raw number at 1,500 weighted playoff minutes (about three deep runs), and the adjustment is capped at ±2.5.
+
+Players with no playoff history, like rookies, get no adjustment. On the site, the position-by-position table shows each player's playoff-adjusted BPM with a ▲ or ▼ for his playoff form. Past postseasons never change, so the daily pipeline fetches them once (about 10 extra requests). Delete the file to refetch it. Seeds come from the standings simulation, and the browser recomputes the bracket whenever the inputs change. `predictor/playoffs.py` and `docs/js/playoffs.js` implement the same model, and a test checks that they produce identical brackets.
 
 ```bash
 python -m predictor --bracket   # print the predicted bracket in the terminal
@@ -103,6 +114,7 @@ Injuries and roster moves need judgment, so they are not automated. All inputs a
 | `moves.csv` | Offseason and in-season roster changes with impact in points | After trades |
 | `teams.csv` | Names, conferences, win totals, 2025–26 record and net rating, preseason record | Once per season |
 | `games.csv`, `players.csv` | Game results and rostered players' stats for the bracket | Automatic, daily |
+| `playoff_history.csv` | Each player's playoff form from the last five postseasons | Automatic, fetched once |
 
 After editing a CSV, rebuild the web page's data so both versions agree:
 
@@ -122,6 +134,7 @@ nba-playoff-predictor/
 │   ├── model.py             ratings, injuries, season simulation, play-in, clinch logic
 │   ├── standings_source.py  fetch and validate the ESPN standings feed
 │   ├── playoffs.py          bracket model: starting fives, season series, best-of-seven odds
+│   ├── playoff_history.py   each player's playoff form compared with the regular season
 │   ├── bref.py              Basketball-Reference schedule, player stats and roster pages
 │   └── __main__.py          command line interface
 ├── scripts/
@@ -145,7 +158,7 @@ nba-playoff-predictor/
 - 2025–26 records and net ratings: [Basketball Reference](https://www.basketball-reference.com/leagues/NBA_2026_ratings.html)
 - 2026–27 win totals: DraftKings lines as published by [Sports Illustrated](https://www.si.com/betting/nba-win-total-predictions-for-every-team-in-2026-27-season-thunder-spurs-only-teams-projected-to-win-60-games) on Oct 15, 2026
 - 2026 preseason records: [RealGM](https://basketball.realgm.com/nba/preseason/standings)
-- Injury statuses: [Covers](https://www.covers.com/sport/basketball/nba/injuries), Oct 19, 2026
+- Injury statuses: [ESPN](https://www.espn.com/nba/injuries) and the NBA's official injury report, Nov 9, 2026
 - 2026–27 standings (updated daily): ESPN's public standings feed, which is unofficial and may change without notice
 
 The impact values for injuries and roster moves are judgment-based estimates, not measured stats. They are meant to be edited.

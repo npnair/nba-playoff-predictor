@@ -48,7 +48,8 @@ def main() -> None:
         "injuries": [asdict(j) for j in injuries],
         "moves": [asdict(m) for m in moves],
         "games": [[g["date"], g["home"], g["away"], g["home_pts"], g["away_pts"]] for g in load_games()],
-        "players": [[p["team"], p["bref_id"], p["player"], p["pos"], p["mpg"], p["bpm"], p["minutes"]]
+        "players": [[p["team"], p["bref_id"], p["player"], p["pos"], p["mpg"], p["bpm"], p["minutes"],
+                     p["po_adj"]]
                     for p in load_players()],
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)

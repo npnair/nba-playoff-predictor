@@ -1,5 +1,5 @@
 """Basketball-Reference pages used by the playoff bracket: the season schedule (results of every
-game), player advanced stats and current team rosters.
+game), player advanced stats (regular season and playoffs) and current team rosters.
 
 Basketball-Reference allows about 20 requests a minute, so requests are spaced out.
 """
@@ -141,10 +141,10 @@ def parse_advanced(page: str | bytes) -> list[dict]:
     return list(players.values())
 
 
-def fetch_advanced(season: int) -> list[dict] | None:
-    """None before the season's first game."""
+def fetch_advanced(season: int, playoffs: bool = False) -> list[dict] | None:
+    """None before the season's (or postseason's) first game."""
     try:
-        page = get(f"/leagues/NBA_{season}_advanced.html")
+        page = get(f"/{'playoffs' if playoffs else 'leagues'}/NBA_{season}_advanced.html")
     except NotFound:
         return None
     if b'id="advanced' not in page:
