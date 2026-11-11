@@ -20,10 +20,10 @@ WESTERN CONFERENCE
 ## How the model works
 
 1. **Preseason rating.** Every team gets a rating in points of margin per game versus league average, blended from three inputs (default weights in brackets):
-   - **Last season (30%)**: 2025–26 net rating, regressed 30% toward average, plus an adjustment for each offseason move (`data/moves.csv`). The moves table is what makes last season's number describe this season's roster.
-   - **Preseason win total (60%)**: the betting line, converted at 2.7 wins per point of margin. Lines are scaled so the league totals exactly 1,230 wins.
-   - **Preseason games (10%)**: exhibition record, smoothed with a 3–3 ghost record because four or five preseason games say very little.
-2. **In-season blend.** Once games are played, each team's actual point differential is mixed in. The preseason rating counts as 25 games of evidence by default, so a team 25 games in is rated half on its preseason rating and half on its real margin.
+   - **Last season (75%)**: 2025–26 net rating, regressed 30% toward average, plus an adjustment for each offseason move (`data/moves.csv`). The moves table is what makes last season's number describe this season's roster.
+   - **Preseason win total (25%)**: the betting line, converted at 2.7 wins per point of margin. Lines are scaled so the league totals exactly 1,230 wins.
+   - **Preseason games (0%, off by default)**: exhibition record, smoothed with a 3–3 ghost record because four or five preseason games say very little.
+2. **In-season blend.** Once games are played, each team's actual point differential is mixed in. The preseason rating counts as 7 games of evidence by default. With about 11 games played (mid-November) that works out to 30% last season, 10% win total and 60% games so far, and the games-so-far share keeps growing: about 85% by midseason and over 90% by April.
 3. **Injuries, game by game.** Each injury has an impact (net rating points) and a number of games out. In every simulated season the team plays weaker for exactly those games. Opponents' injuries count too.
 4. **Simulate.** Each remaining game is played against a random opponent with home court worth 2.5 points, and a logistic curve turns the rating gap into a win probability. Each simulated season also draws a random shock to every team's rating, sized by how uncertain that rating still is.
 5. **Seed and play in.** Teams are ranked by wins in each conference. Seeds 7 vs 8 and 9 vs 10 play, then the 7/8 loser hosts the 9/10 winner for the final playoff spot.

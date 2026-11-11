@@ -69,8 +69,9 @@ def test_season_results_take_over(data):
     sac.w, sac.l, sac.point_diff = 60, 0, 15.0
     rating, _, prior = team_ratings(played, moves, Settings())
     sac_i = [t.id for t in played].index("SAC")
-    # 60 games vs 25 games of preseason evidence: the real margin should dominate
-    expected = (prior[sac_i] * 25 + 15.0 * 60) / 85
+    # 60 games vs the preseason rating's games of evidence: the real margin should dominate
+    k = Settings().evidence_games
+    expected = (prior[sac_i] * k + 15.0 * 60) / (k + 60)
     assert rating[sac_i] == pytest.approx(expected)
     assert rating[sac_i] > 8
 

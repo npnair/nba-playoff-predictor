@@ -13,6 +13,9 @@
   ];
   const INT_FIELDS = new Set(["w", "l", "pre_w", "pre_l"]);
   const SLIDERS = ["wLast", "wLine", "wPre", "kRange"];
+  // Default weights. Bump SETTINGS_VERSION when these change so visitors' saved sliders reset to them.
+  const DEFAULTS = { wLast: 75, wLine: 25, wPre: 0, kRange: 7 };
+  const SETTINGS_VERSION = 2;
 
   const $ = (id) => document.getElementById(id);
   const clone = (x) => JSON.parse(JSON.stringify(x));
@@ -30,8 +33,8 @@
     try {
       const s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
       if (!s) return;
-      // Model settings carry over between visits
-      SLIDERS.concat(["simSel"]).forEach((k) => { if (s[k] != null) $(k).value = s[k]; });
+      // Model settings carry over between visits, unless the defaults have changed since
+      if (s.settingsVersion === SETTINGS_VERSION) SLIDERS.concat(["simSel"]).forEach((k) => { if (s[k] != null) $(k).value = s[k]; });
       // Edits to the data only apply to the data they were made on. Once the daily pipeline
       // publishes newer standings, the visitor sees the new data instead of their old copy.
       if (s.dataVersion !== DATA.asOf) return;
@@ -47,7 +50,7 @@
   }
   function save() {
     try {
-      const s = { dataVersion: DATA.asOf, teams, injuries, moves };
+      const s = { dataVersion: DATA.asOf, settingsVersion: SETTINGS_VERSION, teams, injuries, moves };
       SLIDERS.concat(["asof", "simSel"]).forEach((k) => { s[k] = $(k).value; });
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
     } catch (e) { /* ignore */ }
@@ -67,6 +70,10 @@
       $(bar).style.width = v * 100 + "%";
     });
     $("kVal").textContent = $("kRange").value;
+    // Overall mix for an average team today, games so far included
+    const gp = teams.reduce((s, t) => s + M.gamesPlayed(t), 0) / teams.length, k = +$("kRange").value;
+    const g = gp / (gp + k), pr = 1 - g, r = (v) => Math.round(v * 100) + "%";
+    $("todayMix").textContent = gp ? `Today's mix (about ${Math.round(gp)} games played): ${r(pr * a)} last season · ${r(g)} games so far · ${r(pr * b)} win total${c * pr >= 0.005 ? ` · ${r(pr * c)} preseason games` : ""}.` : "";
   }
 
   // ---------- boards ----------
@@ -259,7 +266,7 @@
     teams = clone(DATA.teams);
     injuries = clone(DATA.injuries);
     moves = clone(DATA.moves);
-    [["wLast", 30], ["wLine", 60], ["wPre", 10], ["kRange", 25]].forEach(([id, v]) => { $(id).value = v; });
+    Object.entries(DEFAULTS).forEach(([id, v]) => { $(id).value = v; });
     $("asof").value = DATA.asOf;
     showWeights();
     buildTeamEditor();

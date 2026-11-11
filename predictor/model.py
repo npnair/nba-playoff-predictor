@@ -28,10 +28,12 @@ RATING_SD = 3.0                 # uncertainty in a preseason rating, points
 
 @dataclass
 class Settings:
-    weight_last: float = 30
-    weight_line: float = 60
-    weight_preseason: float = 10
-    evidence_games: float = 25    # how many games of evidence the preseason rating counts for
+    weight_last: float = 75
+    weight_line: float = 25
+    weight_preseason: float = 0
+    evidence_games: float = 7     # how many games of evidence the preseason rating counts for
+    # With ~11 games played (Nov 11) these defaults give 30% last season, 10% win total and 60%
+    # games so far; the games share keeps growing (about 85% by midseason).
     sims: int = 5000
     seed: int | None = None
 

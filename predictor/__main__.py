@@ -40,10 +40,10 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Simulate the 2026-27 NBA season and project playoff seeds.")
     p.add_argument("--sims", type=int, default=5000, help="number of simulated seasons (default 5000)")
     p.add_argument("--seed", type=int, default=None, help="random seed for repeatable results")
-    p.add_argument("--weights", type=float, nargs=3, metavar=("LAST", "LINE", "PRESEASON"), default=(30, 60, 10),
-                   help="relative weights for last season, win total line and preseason games (default 30 60 10)")
-    p.add_argument("--evidence", type=float, default=25,
-                   help="games of evidence the preseason rating counts for (default 25)")
+    p.add_argument("--weights", type=float, nargs=3, metavar=("LAST", "LINE", "PRESEASON"), default=(75, 25, 0),
+                   help="relative weights for last season, win total line and preseason games (default 75 25 0)")
+    p.add_argument("--evidence", type=float, default=7,
+                   help="games of evidence the preseason rating counts for (default 7)")
     p.add_argument("--data-dir", type=Path, default=DATA_DIR, help="folder holding the CSV inputs")
     p.add_argument("--out", type=Path, default=None, help="optional CSV file for the full results")
     p.add_argument("--bracket", action="store_true",

@@ -42,19 +42,20 @@
   <section class="panel">
     <h2>Model inputs</h2>
     <div class="controls">
-      <div class="field"><label for="wLast">Last season (2025–26): <span id="vLast"></span></label><input type="range" id="wLast" min="0" max="100" value="30"></div>
-      <div class="field"><label for="wLine">Preseason win total: <span id="vLine"></span></label><input type="range" id="wLine" min="0" max="100" value="60"></div>
-      <div class="field"><label for="wPre">Preseason games: <span id="vPre"></span></label><input type="range" id="wPre" min="0" max="100" value="10"></div>
+      <div class="field"><label for="wLast">Last season (2025–26): <span id="vLast"></span></label><input type="range" id="wLast" min="0" max="100" value="75"></div>
+      <div class="field"><label for="wLine">Preseason win total: <span id="vLine"></span></label><input type="range" id="wLine" min="0" max="100" value="25"></div>
+      <div class="field"><label for="wPre">Preseason games: <span id="vPre"></span></label><input type="range" id="wPre" min="0" max="100" value="0"></div>
     </div>
     <div class="mix" aria-hidden="true"><i class="m1" id="mix1"></i><i class="m2" id="mix2"></i><i class="m3" id="mix3"></i></div>
     <div class="mixkey"><span><i class="dot" style="background:var(--ball)"></i>Last season net rating, regressed 30%, plus offseason moves</span><span><i class="dot" style="background:var(--playin)"></i>Win total line (prices in trades and signings)</span><span><i class="dot" style="background:var(--muted)"></i>Preseason W-L</span></div>
-    <p class="hint">Sliders are relative and rescale to 100%.</p>
+    <p class="hint">Sliders are relative and rescale to 100%. Once games are played they are mixed in too, counting more as the season goes on.</p>
     <div class="controls">
-      <div class="field"><label for="kRange">Pre-2026–27 evidence counts as: <span id="kVal">25</span> games</label><input type="range" id="kRange" min="5" max="60" step="1" value="25"></div>
+      <div class="field"><label for="kRange">Pre-2026–27 evidence counts as: <span id="kVal">7</span> games</label><input type="range" id="kRange" min="3" max="60" step="1" value="7"></div>
       <div class="field"><label for="simSel">Simulations</label><select id="simSel"><option>2000</option><option selected>5000</option><option>10000</option></select></div>
       <div class="field"><label for="asof">Stats as of</label><input type="text" id="asof"></div>
       <button id="runBtn">Simulate season</button>
     </div>
+    <p class="hint" id="todayMix"></p>
   </section>
 
   <section class="panel">
