@@ -66,3 +66,32 @@ def test_js_and_python_brackets_match():
     result = subprocess.run(["node", "-e", script], input=payload, capture_output=True, text=True, check=True)
     js = json.loads(result.stdout)
     assert js == json.loads(json.dumps(py))
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="node is not installed")
+def test_js_and_python_ratings_match_with_injuries():
+    """docs/js/model.js ratings and injury wins must match predictor/model.py."""
+    from dataclasses import asdict
+
+    from predictor.data_io import load_all
+    from predictor.model import Settings, injury_wins_lost, team_ratings
+
+    teams, injuries, moves = load_all()
+    s = Settings()
+    py_r = team_ratings(teams, moves, s, injuries)[0]
+    py_inj = [injury_wins_lost(t, injuries, s.evidence_games) for t in teams]
+    payload = json.dumps({"teams": [asdict(t) for t in teams], "injuries": [asdict(j) for j in injuries],
+                          "moves": [asdict(m) for m in moves], "k": s.evidence_games,
+                          "s": {"weightLast": s.weight_last, "weightLine": s.weight_line,
+                                "weightPreseason": s.weight_preseason, "evidenceGames": s.evidence_games}})
+    script = f"""
+      require({json.dumps(str(ROOT / 'docs/js/model.js'))});
+      const M = globalThis.PL_MODEL, d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
+      console.log(JSON.stringify({{
+        r: M.ratings(d.teams, d.moves, d.s, d.injuries).map((x) => x.rating),
+        inj: d.teams.map((t) => M.injuryWinsLost(t, d.injuries, d.k)),
+      }}));
+    """
+    js = json.loads(subprocess.run(["node", "-e", script], input=payload, capture_output=True, text=True, check=True).stdout)
+    assert js["r"] == pytest.approx(list(py_r), abs=1e-9)
+    assert js["inj"] == pytest.approx(py_inj, abs=1e-9)

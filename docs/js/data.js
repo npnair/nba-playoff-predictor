@@ -428,379 +428,442 @@ window.PL_DATA = {
    "team": "ATL",
    "player": "Henri Veesaar (ACL, season)",
    "impact": 0.3,
-   "games_out": 82
+   "games_out": 82,
+   "games_missed": 13
   },
   {
    "team": "ATL",
    "player": "Mouhamed Gueye (foot fracture, ~Nov 20)",
    "impact": 0.6,
-   "games_out": 5
+   "games_out": 5,
+   "games_missed": 13
   },
   {
    "team": "ATL",
    "player": "Asa Newell (toe, day to day)",
    "impact": 0.3,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 8
   },
   {
    "team": "BKN",
    "player": "Egor Demin (out, no timeline)",
    "impact": 0.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 6
   },
   {
    "team": "CHA",
    "player": "Kon Knueppel (hamstring, re-eval ~Dec 8)",
    "impact": 2.5,
-   "games_out": 13
+   "games_out": 13,
+   "games_missed": 11
   },
   {
    "team": "CHA",
    "player": "Dennis Schroder (hamstring, re-eval ~Nov 22)",
    "impact": 0.8,
-   "games_out": 6
+   "games_out": 6,
+   "games_missed": 3
   },
   {
    "team": "CHA",
    "player": "Brandon Miller (hip, day to day)",
    "impact": 1.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 2
   },
   {
    "team": "CHA",
    "player": "Grant Williams (hamstring)",
    "impact": 0.8,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 11
   },
   {
    "team": "CLE",
    "player": "Sam Merrill (elbow)",
    "impact": 0.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 4
   },
   {
    "team": "CLE",
    "player": "Jaylon Tyson (ankle)",
    "impact": 0.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 6
   },
   {
    "team": "DAL",
    "player": "Dereck Lively II (foot, unclear)",
    "impact": 1.5,
-   "games_out": 5
+   "games_out": 5,
+   "games_missed": 12
   },
   {
    "team": "DEN",
    "player": "Julian Strawther (knee, ~late Nov)",
    "impact": 0.5,
-   "games_out": 9
+   "games_out": 9,
+   "games_missed": 10
   },
   {
    "team": "DET",
    "player": "Jalen Duren (hamstring, re-eval ~Nov 22)",
    "impact": 2.0,
-   "games_out": 6
+   "games_out": 6,
+   "games_missed": 9
   },
   {
    "team": "DET",
    "player": "Isaiah Joe (hip, ~Nov 17)",
    "impact": 0.8,
-   "games_out": 3
+   "games_out": 3,
+   "games_missed": 8
   },
   {
    "team": "GSW",
    "player": "Jimmy Butler III (ACL, Jan–Feb)",
    "impact": 3.0,
-   "games_out": 31
+   "games_out": 31,
+   "games_missed": 13
   },
   {
    "team": "GSW",
    "player": "Kristaps Porzingis (stepped away, indefinite)",
    "impact": 1.5,
-   "games_out": 25
+   "games_out": 25,
+   "games_missed": 13
   },
   {
    "team": "GSW",
    "player": "Moses Moody (patellar tendon, Dec–Jan)",
    "impact": 0.8,
-   "games_out": 19
+   "games_out": 19,
+   "games_missed": 13
   },
   {
    "team": "GSW",
    "player": "Will Richard (thumb UCL tear, indefinite)",
    "impact": 0.5,
-   "games_out": 24
+   "games_out": 24,
+   "games_missed": 1
   },
   {
    "team": "HOU",
    "player": "Steven Adams (calf, no timetable)",
    "impact": 0.8,
-   "games_out": 5
+   "games_out": 5,
+   "games_missed": 12
   },
   {
    "team": "HOU",
    "player": "Clint Capela (ankle)",
    "impact": 0.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 7
   },
   {
    "team": "IND",
    "player": "Tyrese Haliburton (hamstring, no timetable)",
    "impact": 3.0,
-   "games_out": 4
+   "games_out": 4,
+   "games_missed": 9
   },
   {
    "team": "IND",
    "player": "Ben Sheppard (meniscus surgery, months)",
    "impact": 0.3,
-   "games_out": 25
+   "games_out": 25,
+   "games_missed": 12
   },
   {
    "team": "IND",
    "player": "Johnny Furphy (ACL, rehab)",
    "impact": 0.3,
-   "games_out": 25
+   "games_out": 25,
+   "games_missed": 13
   },
   {
    "team": "LAC",
    "player": "Brandon Ingram (Achilles/heel, unclear)",
    "impact": 1.5,
-   "games_out": 3
+   "games_out": 3,
+   "games_missed": 11
   },
   {
    "team": "LAC",
    "player": "Bradley Beal (knee, ~late Nov)",
    "impact": 1.0,
-   "games_out": 9
+   "games_out": 9,
+   "games_missed": 11
   },
   {
    "team": "LAC",
    "player": "Jordan Miller (rotator cuff, ~Mar)",
    "impact": 0.3,
-   "games_out": 53
+   "games_out": 53,
+   "games_missed": 11
   },
   {
    "team": "LAC",
    "player": "Isaiah Jackson (groin, day to day)",
    "impact": 0.3,
-   "games_out": 1
+   "games_out": 1,
+   "games_missed": 1
   },
   {
    "team": "MEM",
    "player": "Scotty Pippen Jr. (lumbar disc)",
    "impact": 0.5,
-   "games_out": 3
+   "games_out": 3,
+   "games_missed": 7
   },
   {
    "team": "MEM",
    "player": "Isaiah Stewart (knee bone bruise)",
    "impact": 0.8,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 3
   },
   {
    "team": "MIN",
    "player": "Anthony Edwards (knee scope, ~late Dec)",
    "impact": 3.5,
-   "games_out": 19
+   "games_out": 19,
+   "games_missed": 8
   },
   {
    "team": "MIN",
    "player": "Donte DiVincenzo (Achilles, ~Apr)",
    "impact": 1.0,
-   "games_out": 67
+   "games_out": 67,
+   "games_missed": 12
   },
   {
    "team": "NOP",
    "player": "Trey Murphy III (knees)",
    "impact": 1.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 4
   },
   {
    "team": "NOP",
    "player": "Yves Missi (knee bone bruise, ~Nov 16)",
    "impact": 0.5,
-   "games_out": 3
+   "games_out": 3,
+   "games_missed": 11
   },
   {
    "team": "OKC",
    "player": "Chet Holmgren (patellar tendon, 8–10 wks)",
    "impact": 2.5,
-   "games_out": 25
+   "games_out": 25,
+   "games_missed": 10
   },
   {
    "team": "OKC",
    "player": "Jalen Williams (leg fracture, ~Mar)",
    "impact": 2.0,
-   "games_out": 53
+   "games_out": 53,
+   "games_missed": 10
   },
   {
    "team": "OKC",
    "player": "Cason Wallace (shoulder surgery, ~Mar)",
    "impact": 1.0,
-   "games_out": 53
+   "games_out": 53,
+   "games_missed": 10
   },
   {
    "team": "OKC",
    "player": "Thomas Sorber (knee)",
    "impact": 0.3,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 13
   },
   {
    "team": "OKC",
    "player": "Otega Oweh (Achilles, season)",
    "impact": 0.3,
-   "games_out": 82
+   "games_out": 82,
+   "games_missed": 13
   },
   {
    "team": "ORL",
    "player": "Paolo Banchero (high ankle, ~Nov 22)",
    "impact": 2.5,
-   "games_out": 6
+   "games_out": 6,
+   "games_missed": 10
   },
   {
    "team": "ORL",
    "player": "Jalen Suggs (knee bone bruise, re-eval)",
    "impact": 1.2,
-   "games_out": 3
+   "games_out": 3,
+   "games_missed": 8
   },
   {
    "team": "ORL",
    "player": "Noah Penda (hamstring, ~Nov 18)",
    "impact": 0.3,
-   "games_out": 4
+   "games_out": 4,
+   "games_missed": 12
   },
   {
    "team": "ORL",
    "player": "Jonathan Isaac (knee)",
    "impact": 0.3,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 12
   },
   {
    "team": "PHI",
    "player": "Dominick Barlow (back, ~Nov 18)",
    "impact": 0.3,
-   "games_out": 4
+   "games_out": 4,
+   "games_missed": 13
   },
   {
    "team": "PHI",
    "player": "Adem Bona (back)",
    "impact": 0.5,
-   "games_out": 1
+   "games_out": 1,
+   "games_missed": 4
   },
   {
    "team": "PHI",
    "player": "Ariel Hukporti (Achilles, season)",
    "impact": 0.2,
-   "games_out": 82
+   "games_out": 82,
+   "games_missed": 13
   },
   {
    "team": "PHX",
    "player": "Mark Williams (shoulder, ~Feb)",
    "impact": 1.5,
-   "games_out": 40
+   "games_out": 40,
+   "games_missed": 11
   },
   {
    "team": "POR",
    "player": "Ja Morant (hamstring, ~Dec 1)",
    "impact": 1.5,
-   "games_out": 10
+   "games_out": 10,
+   "games_missed": 8
   },
   {
    "team": "POR",
    "player": "Vit Krejci (leg fracture, ~Jan)",
    "impact": 0.5,
-   "games_out": 25
+   "games_out": 25,
+   "games_missed": 5
   },
   {
    "team": "POR",
    "player": "Shaedon Sharpe (meniscus, ~Mar)",
    "impact": 2.0,
-   "games_out": 53
+   "games_out": 53,
+   "games_missed": 12
   },
   {
    "team": "SAC",
    "player": "Maxime Raynaud (knee)",
    "impact": 1.0,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 12
   },
   {
    "team": "SAC",
    "player": "Ben Simmons (Achilles, season)",
    "impact": 0.3,
-   "games_out": 82
+   "games_out": 82,
+   "games_missed": 12
   },
   {
    "team": "SAS",
    "player": "Jayden Quaintance (knee surgery, ~Dec)",
    "impact": 0.3,
-   "games_out": 11
+   "games_out": 11,
+   "games_missed": 13
   },
   {
    "team": "SAS",
    "player": "Tobias Harris (calf)",
    "impact": 0.8,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 13
   },
   {
    "team": "SAS",
    "player": "Devin Vassell (groin, day to day)",
    "impact": 1.0,
-   "games_out": 1
+   "games_out": 1,
+   "games_missed": 2
   },
   {
    "team": "TOR",
    "player": "Kawhi Leonard (knee swelling, re-eval)",
    "impact": 3.0,
-   "games_out": 6
+   "games_out": 6,
+   "games_missed": 10
   },
   {
    "team": "TOR",
    "player": "Nate Bittle (avulsion fracture)",
    "impact": 0.5,
-   "games_out": 2
+   "games_out": 2,
+   "games_missed": 12
   },
   {
    "team": "TOR",
    "player": "Scottie Barnes (groin, day to day)",
    "impact": 2.5,
-   "games_out": 1
+   "games_out": 1,
+   "games_missed": 4
   },
   {
    "team": "UTA",
    "player": "Jaren Jackson Jr. (MCL, 6–8 wks)",
    "impact": 1.5,
-   "games_out": 16
+   "games_out": 16,
+   "games_missed": 9
   },
   {
    "team": "UTA",
    "player": "Jusuf Nurkic (foot, re-eval ~Nov 20)",
    "impact": 1.0,
-   "games_out": 5
+   "games_out": 5,
+   "games_missed": 13
   },
   {
    "team": "WAS",
    "player": "Reece Beekman (AC joint, ~Dec 3)",
    "impact": 0.3,
-   "games_out": 11
+   "games_out": 11,
+   "games_missed": 12
   },
   {
    "team": "WAS",
    "player": "Justin Champagnie (foot, months)",
    "impact": 0.5,
-   "games_out": 50
+   "games_out": 50,
+   "games_missed": 9
   },
   {
    "team": "WAS",
    "player": "Tristan Vukcevic (hip, ~Nov 16)",
    "impact": 0.3,
-   "games_out": 3
+   "games_out": 3,
+   "games_missed": 13
   },
   {
    "team": "WAS",
    "player": "Jamir Watkins (ACL, ~Apr)",
    "impact": 0.3,
-   "games_out": 67
+   "games_out": 67,
+   "games_missed": 13
   }
  ],
  "moves": [

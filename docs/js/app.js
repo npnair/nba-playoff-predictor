@@ -43,7 +43,8 @@
         if (t) TEAM_FIELDS.forEach(([f]) => { if (x[f] != null && !isNaN(+x[f])) t[f] = +x[f]; });
       });
       const known = (j) => teams.some((t) => t.id === j.team);
-      if (Array.isArray(s.injuries)) injuries = s.injuries.filter(known);
+      // Saved before the games-missed column existed: use the repo's injuries instead
+      if (Array.isArray(s.injuries) && s.injuries.every((j) => "games_missed" in j)) injuries = s.injuries.filter(known);
       if (Array.isArray(s.moves)) moves = s.moves.filter(known);
       if (s.asof != null) $("asof").value = s.asof;
     } catch (e) { /* storage unavailable: use repo data */ }
@@ -94,7 +95,7 @@
       const list = rows.filter((r) => teams[r.index].conference === conf).sort((a, b) => a.avgSeed - b.avgSeed);
       const body = list.map((r, k) => {
         const t = teams[r.index];
-        const lost = M.injuryWinsLost(t, injuries);
+        const lost = M.injuryWinsLost(t, injuries, $("kRange").value);
         const moved = M.moveTotal(moves, t.id);
         const injNames = injuries.filter((j) => j.team === t.id).map((j) => j.player).join("; ") || "No injuries listed";
         const moveNames = moves.filter((m) => m.team === t.id).map((m) => m.move).join("; ") || "No moves listed";
@@ -105,7 +106,7 @@
           <td class="rec">${t.w}-${t.l}</td>
           <td class="mono">${signed(ratings[r.index].rating)}</td>
           <td class="mono" title="${esc(moveNames)}">${Math.abs(moved) < 0.05 ? "—" : signed(moved)}</td>
-          <td class="inj${lost < 0.05 ? " zero" : ""}" title="${esc(injNames)}">${lost < 0.05 ? "—" : "−" + lost.toFixed(1)}</td>
+          <td class="inj${Math.abs(lost) < 0.05 ? " zero" : lost < 0 ? " gain" : ""}" title="${esc(injNames)}">${Math.abs(lost) < 0.05 ? "—" : signed(-lost)}</td>
           <td class="pw">${r.projWins.toFixed(1)}</td>
           ${probCell(r.top6, "b-top")}${probCell(r.playIn, "b-pi")}${probCell(r.playoffs, "b-po")}
         </tr>`;
@@ -120,14 +121,14 @@
           <thead><tr><th class="l">#</th><th class="l">Team</th><th>Rec</th>
             <th title="Healthy rating, points per game vs average">Rtg</th>
             <th title="Offseason moves, points added to last season's net rating">Moves</th>
-            <th title="Expected wins lost to injuries">Inj</th>
+            <th title="Net wins injuries cost from here: games still to miss, minus credit for games already played shorthanded">Inj</th>
             <th>Proj W</th><th>Top 6</th><th>Play-in</th><th>Playoffs</th></tr></thead>
           <tbody>${body}</tbody>
         </table></div>
         <div class="legend">
           <span><i class="sw" style="border-color:var(--ball)"></i>Playoff line (top 6)</span>
           <span><i class="sw" style="border-color:var(--playin)"></i>Play-in line (top 10)</span>
-          <span>Rtg = healthy margin vs average · Moves = roster change vs last season · Inj = wins lost to injuries</span>
+          <span>Rtg = healthy margin vs average · Moves = roster change vs last season · Inj = net wins from injuries (+ when players already missing will return)</span>
         </div>`;
     });
     const gp = teams.reduce((sum, t) => sum + M.gamesPlayed(t), 0) / teams.length;
@@ -225,6 +226,7 @@
       columns: [
         { field: "impact", label: "Impact (pts)", step: 0.1, min: 0, max: 15 },
         { field: "games_out", label: "Games out", step: 1, min: 0, max: 82 },
+        { field: "games_missed", label: "Missed so far", step: 1, min: 0, max: 82 },
       ],
     });
     buildListEditor({
@@ -286,7 +288,7 @@
   $("exportBtn").addEventListener("click", exportStandings);
   $("resetBtn").addEventListener("click", restore);
   $("addInj").addEventListener("click", () => {
-    injuries.push({ team: "OKC", player: "New injury", impact: 1, games_out: 10 });
+    injuries.push({ team: "OKC", player: "New injury", impact: 1, games_out: 10, games_missed: 0 });
     buildEditors(); save();
     const el = $(`injTable-${injuries.length - 1}-player`); if (el) { el.focus(); el.select(); }
   });
