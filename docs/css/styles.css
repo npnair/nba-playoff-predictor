@@ -214,3 +214,20 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.82rem}
 .graded .l{text-align:left}
 .pick.ok{color:var(--good);font-weight:700} .pick.miss{color:var(--bad);font-weight:700}
 #weekRange{margin:4px 0 0}
+
+.day h3 .dayrec{font-family:var(--mono);color:var(--ink);margin-left:6px}
+.day-body{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:12px;align-items:start}
+@media (max-width:820px){.day-body{grid-template-columns:1fr}.day-sum{order:-1;position:static}}
+.champ b{white-space:nowrap}
+.day-sum{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;position:sticky;top:12px}
+.day-sum h4{margin:0 0 6px;font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.day-sum ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pick-line{display:flex;flex-direction:column;gap:1px;padding:4px 8px;border-left:3px solid var(--line);border-radius:3px;font-size:.88rem}
+.pick-line .det{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.pick-line .mark{font-weight:700;margin-right:5px}
+.pick-line.ok{border-left-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+.pick-line.ok .mark{color:var(--good)}
+.pick-line.miss{border-left-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.pick-line.miss .mark{color:var(--bad)}
+.game.played.ok{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
+.game.played.miss{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
