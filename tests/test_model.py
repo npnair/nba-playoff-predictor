@@ -71,7 +71,8 @@ def test_season_results_take_over(data):
     sac_i = [t.id for t in played].index("SAC")
     # 60 games vs the preseason rating's games of evidence: the real margin should dominate
     k = Settings().evidence_games
-    expected = (prior[sac_i] * k + 15.0 * 60) / (k + 60)
+    observed = 0.8 * 15.0 + 0.2 * (1.0 - 0.5) * 82 / 2.7   # mostly margin, a little record
+    expected = (prior[sac_i] * k + observed * 60) / (k + 60)
     assert rating[sac_i] == pytest.approx(expected)
     assert rating[sac_i] > 8
 
@@ -108,8 +109,9 @@ def test_games_already_missed_are_not_counted_twice(data):
 
     star = Injury("SAC", "Test star", 4.0, 20, games_missed=10)
     healthy, _, prior = team_ratings(played, moves, s, [star])
-    # Shorthanded margin of -3 over 10 games, worth -3 + 4 = +1 with him
-    assert healthy[i] == pytest.approx((prior[i] * k + 1.0 * 10) / (k + 10))
+    # Shorthanded margin over 10 games, plus 4 points a game added back for him
+    from predictor.model import observed_margin
+    assert healthy[i] == pytest.approx((prior[i] * k + (observed_margin(sac) + 4.0) * 10) / (k + 10))
 
     # Nothing missed yet: no add-back, same as before this change
     fresh = Injury("SAC", "Test star", 4.0, 20)
@@ -126,3 +128,20 @@ def test_games_missed_column_is_optional(tmp_path):
     (tmp_path / "injuries.csv").write_text("team,player,impact,games_out\nSAC,Someone,1.0,5\n")
     from predictor.data_io import load_injuries
     assert load_injuries(tmp_path)[0].games_missed == 0
+
+
+def test_record_earns_some_credit(data):
+    """Two teams with the same margin: the one with the better record rates a little higher."""
+    from predictor.model import RECORD_SHARE
+    teams, _, moves = data
+    played = copy.deepcopy(teams)
+    a = next(t for t in played if t.id == "LAL")
+    b = next(t for t in played if t.id == "SAC")
+    a.w, a.l, a.point_diff = 11, 2, 4.0
+    b.w, b.l, b.point_diff = 7, 6, 4.0
+    ia, ib = [t.id for t in played].index("LAL"), [t.id for t in played].index("SAC")
+    rating, _, prior = team_ratings(played, moves, Settings())
+    gain_a = rating[ia] - prior[ia] * Settings().evidence_games / (Settings().evidence_games + 13)
+    gain_b = rating[ib] - prior[ib] * Settings().evidence_games / (Settings().evidence_games + 13)
+    assert gain_a > gain_b
+    assert 0 < RECORD_SHARE < 0.5   # margin stays the main signal

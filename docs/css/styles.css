@@ -66,6 +66,7 @@ tr.cut2 td{border-top:2px dashed var(--playin)}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
 .controls{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:flex-end}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ends{display:flex;justify-content:space-between;width:190px;max-width:100%;font-size:.72rem;color:var(--muted)}
 label{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 input,textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
 input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--ball);outline-offset:2px}
