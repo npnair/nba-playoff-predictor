@@ -14,10 +14,13 @@
   const INT_FIELDS = new Set(["w", "l", "pre_w", "pre_l"]);
   const SLIDERS = ["wLast", "wLine", "wPre", "kRange"];
   // Default weights. Bump SETTINGS_VERSION when these change so visitors' saved sliders reset to them.
-  const DEFAULTS = { wLast: 75, wLine: 25, wPre: 0, kRange: 7 };
-  const SETTINGS_VERSION = 2;
+  // kRange runs backwards from the model's evidence games so that right means "this season counts more"
+  const K_FLIP = 63;   // slider min + max
+  const DEFAULTS = { wLast: 75, wLine: 25, wPre: 0, kRange: K_FLIP - 7 };
+  const SETTINGS_VERSION = 3;
 
   const $ = (id) => document.getElementById(id);
+  const evidenceGames = () => K_FLIP - +$("kRange").value;
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const pct = (v) => (v >= 0.995 ? ">99%" : v <= 0.005 ? (v > 0 ? "<1%" : "0%") : Math.round(v * 100) + "%");
@@ -61,15 +64,15 @@
   function settings() {
     return {
       weightLast: $("wLast").value, weightLine: $("wLine").value, weightPreseason: $("wPre").value,
-      evidenceGames: $("kRange").value, sims: $("simSel").value,
+      evidenceGames: evidenceGames(), sims: $("simSel").value,
     };
   }
   function showWeights() {
     const [a, b, c] = M.blendWeights(settings());
-    $("kVal").textContent = $("kRange").value;
     // Overall mix for an average team today, games so far included
-    const gp = teams.reduce((s, t) => s + M.gamesPlayed(t), 0) / teams.length, k = +$("kRange").value;
+    const gp = teams.reduce((s, t) => s + M.gamesPlayed(t), 0) / teams.length, k = evidenceGames();
     const g = gp / (gp + k), pr = 1 - g, r = (v) => Math.round(v * 100) + "%";
+    $("kVal").textContent = gp ? `${r(g)} today (pre-season = ${k} games)` : `pre-season = ${k} games`;
     [["vLast", "mix1", a], ["vLine", "mix2", b], ["vPre", "mix3", c]].forEach(([label, bar, v]) => {
       $(label).textContent = Math.round(v * 100) + "%";
       $(bar).style.width = pr * v * 100 + "%";
@@ -95,7 +98,7 @@
       const list = rows.filter((r) => teams[r.index].conference === conf).sort((a, b) => a.avgSeed - b.avgSeed);
       const body = list.map((r, k) => {
         const t = teams[r.index];
-        const lost = M.injuryWinsLost(t, injuries, $("kRange").value);
+        const lost = M.injuryWinsLost(t, injuries, evidenceGames());
         const moved = M.moveTotal(moves, t.id);
         const injNames = injuries.filter((j) => j.team === t.id).map((j) => j.player).join("; ") || "No injuries listed";
         const moveNames = moves.filter((m) => m.team === t.id).map((m) => m.move).join("; ") || "No moves listed";
@@ -132,7 +135,7 @@
         </div>`;
     });
     const gp = teams.reduce((sum, t) => sum + M.gamesPlayed(t), 0) / teams.length;
-    const k = +$("kRange").value;
+    const k = evidenceGames();
     $("gpStat").textContent = gp.toFixed(1);
     $("wStat").textContent = Math.round((gp / (gp + k)) * 100) + "%";
     $("injStat").textContent = injuries.length;

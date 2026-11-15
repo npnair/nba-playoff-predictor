@@ -47,10 +47,10 @@
       <div class="field"><label for="wPre">Preseason games: <span id="vPre"></span></label><input type="range" id="wPre" min="0" max="100" value="0"></div>
     </div>
     <div class="mix" aria-hidden="true"><i class="m4" id="mix4"></i><i class="m1" id="mix1"></i><i class="m2" id="mix2"></i><i class="m3" id="mix3"></i></div>
-    <div class="mixkey"><span id="mixkeyGames"><i class="dot" style="background:var(--good)"></i>This season's games (point margin so far)</span><span><i class="dot" style="background:var(--ball)"></i>Last season net rating, regressed 30%, plus offseason moves</span><span><i class="dot" style="background:var(--playin)"></i>Win total line (prices in trades and signings)</span><span><i class="dot" style="background:var(--muted)"></i>Preseason W-L</span></div>
-    <p class="hint">The bar shows the full mix for today. The three sliders split up the pre-season share between them. The green share for this season's games is set by the games slider below and grows as the season goes on.</p>
+    <div class="mixkey"><span id="mixkeyGames"><i class="dot" style="background:var(--good)"></i>This season's games (mostly point margin, some W-L)</span><span><i class="dot" style="background:var(--ball)"></i>Last season net rating, regressed 30%, plus offseason moves</span><span><i class="dot" style="background:var(--playin)"></i>Win total line (prices in trades and signings)</span><span><i class="dot" style="background:var(--muted)"></i>Preseason W-L</span></div>
+    <p class="hint">The bar shows the full mix for today. The three sliders split up the pre-season share between them. The green share for this season's games is set by the "How much this season counts" slider below and grows as the season goes on.</p>
     <div class="controls">
-      <div class="field"><label for="kRange">Pre-2026–27 evidence counts as: <span id="kVal">7</span> games</label><input type="range" id="kRange" min="3" max="60" step="1" value="7"></div>
+      <div class="field"><label for="kRange" title="Slide right to trust this season's games more. Behind the scenes, the pre-season rating is worth as many games as shown in brackets.">How much this season counts: <span id="kVal"></span></label><input type="range" id="kRange" min="3" max="60" step="1" value="56"><span class="ends"><span>Less</span><span>More</span></span></div>
       <div class="field"><label for="simSel">Simulations</label><select id="simSel"><option>2000</option><option selected>5000</option><option>10000</option></select></div>
       <div class="field"><label for="asof">Stats as of</label><input type="text" id="asof"></div>
       <button id="runBtn">Simulate season</button>

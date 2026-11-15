@@ -10,6 +10,7 @@
   const LAST_SEASON_KEEP = 0.7;
   const PRESEASON_GHOST_GAMES = 3;
   const RATING_SD = 3.0;
+  const RECORD_SHARE = 0.2;   // share of the in-season result taken from W-L record, rest from margin
 
   const gamesPlayed = (t) => t.w + t.l;
   const gamesLeft = (t) => Math.max(0, GAMES - gamesPlayed(t));
@@ -43,6 +44,15 @@
       .reduce((sum, j) => sum + (+j.impact || 0) * Math.min(Math.max(0, +j.games_missed || 0), gamesPlayed(t)), 0);
   }
 
+  // This season's evidence: mostly point differential, plus a little W-L record.
+  function observedMargin(t) {
+    const gp = gamesPlayed(t);
+    if (!gp) return 0;
+    const record = (t.w / gp - 0.5) * GAMES / WINS_PER_POINT;
+    if (!t.point_diff) return record;   // no margin in the feed: record alone
+    return (1 - RECORD_SHARE) * t.point_diff + RECORD_SHARE * record;
+  }
+
   function ratings(teams, moves, s, injuries = []) {
     const [a, b, c] = blendWeights(s);
     const raw = components(teams, moves).map((m) => a * m.last + b * m.line + c * m.preseason);
@@ -51,7 +61,7 @@
     return teams.map((t, i) => {
       const prior = raw[i] - mean;
       const gp = gamesPlayed(t);
-      const observed = t.point_diff || !gp ? t.point_diff : (t.w / gp - 0.5) * GAMES / WINS_PER_POINT;
+      const observed = observedMargin(t);
       return {
         prior,
         rating: (prior * k + observed * gp + healthyBonus(t, injuries)) / (k + gp),
@@ -161,7 +171,7 @@
   }
 
   global.PL_MODEL = {
-    GAMES, gamesPlayed, gamesLeft, blendWeights, moveTotal, components, healthyBonus, ratings,
+    GAMES, gamesPlayed, gamesLeft, blendWeights, moveTotal, components, healthyBonus, observedMargin, ratings,
     penalties, winProb, simulate, injuryWinsLost, clinchStatus,
   };
 })(typeof window !== "undefined" ? window : globalThis);

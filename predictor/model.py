@@ -4,7 +4,8 @@ Pipeline:
 1. Preseason rating per team (points of margin per game vs. league average), a weighted
    blend of last season's net rating adjusted for offseason moves, the preseason win
    total line, and the preseason exhibition record.
-2. Blend with the 2026-27 point differential, weighted by games played.
+2. Blend with the 2026-27 results, weighted by games played. Results are mostly point
+   differential with a little win-loss record mixed in, so closing out games earns some credit.
    Games a player has already missed are added back first, so the blended rating describes a
    healthy roster and an injury is never counted twice.
 3. Simulate every remaining game, lowering a team's rating while injured players are out.
@@ -26,6 +27,7 @@ LOGISTIC_SCALE = 7.0            # spread of single-game outcomes
 LAST_SEASON_KEEP = 0.7          # regress last season's net rating 30% toward average
 PRESEASON_GHOST_GAMES = 3       # add a 3-3 ghost record: exhibition games are noisy
 RATING_SD = 3.0                 # uncertainty in a preseason rating, points
+RECORD_SHARE = 0.2              # share of the in-season result taken from W-L record, rest from margin
 
 
 @dataclass
@@ -84,6 +86,20 @@ def healthy_bonus(teams: list[Team], injuries: list[Injury]) -> np.ndarray:
     return out
 
 
+def record_margin(team: Team) -> float:
+    """Win-loss record expressed as points of margin per game."""
+    return (team.w / team.games_played - 0.5) * GAMES / WINS_PER_POINT
+
+
+def observed_margin(team: Team) -> float:
+    """This season's evidence: mostly point differential, plus a little W-L record."""
+    if not team.games_played:
+        return 0.0
+    if not team.point_diff:   # no margin in the feed: fall back to the record alone
+        return record_margin(team)
+    return (1 - RECORD_SHARE) * team.point_diff + RECORD_SHARE * record_margin(team)
+
+
 def team_ratings(teams: list[Team], moves: list[Move], s: Settings,
                  injuries: list[Injury] = ()) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Return (rating, rating_sd, preseason_prior) arrays, one entry per team. Ratings are healthy."""
@@ -94,11 +110,7 @@ def team_ratings(teams: list[Team], moves: list[Move], s: Settings,
 
     k = s.evidence_games
     gp = np.array([t.games_played for t in teams], dtype=float)
-    observed = np.array([
-        t.point_diff if (t.point_diff or not t.games_played)
-        else (t.w / t.games_played - 0.5) * GAMES / WINS_PER_POINT
-        for t in teams
-    ])
+    observed = np.array([observed_margin(t) for t in teams])
     rating = (prior * k + observed * gp + healthy_bonus(teams, injuries)) / (k + gp)
     sd = RATING_SD * np.sqrt(k / (k + gp))
     return rating, sd, prior
