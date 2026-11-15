@@ -3,7 +3,7 @@
 :root{
   --bg:#eef0f4; --surface:#ffffff; --ink:#151a2c; --muted:#5b6275; --line:#d6d9e2;
   --ball:#d9561a; --ball-soft:#f6dccd; --playin:#3f6db3; --playin-soft:#d8e3f4;
-  --good:#1f7a4d; --bad:#b0302b;
+  --good:#1f7a4d; --bad:#b0302b; --roster:#7a4fb5;
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -11,11 +11,11 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#10131d; --surface:#181c29; --ink:#e9ecf3; --muted:#9aa1b4; --line:#2b3142;
   --ball:#f07a3c; --ball-soft:#4a2a1b; --playin:#7ea3e3; --playin-soft:#22324f;
-  --good:#5cc68f; --bad:#ef7a73; color-scheme:dark}}
+  --good:#5cc68f; --bad:#ef7a73; --roster:#b391e6; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#10131d; --surface:#181c29; --ink:#e9ecf3; --muted:#9aa1b4; --line:#2b3142;
   --ball:#f07a3c; --ball-soft:#4a2a1b; --playin:#7ea3e3; --playin-soft:#22324f;
-  --good:#5cc68f; --bad:#ef7a73; color-scheme:dark}
+  --good:#5cc68f; --bad:#ef7a73; --roster:#b391e6; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
@@ -78,7 +78,7 @@ button:disabled{opacity:.6;cursor:wait}
 .hint{color:var(--muted);font-size:.88rem;margin:0;max-width:76ch}
 .mix{display:flex;height:10px;border-radius:5px;overflow:hidden;max-width:420px;background:var(--line)}
 .mix i{display:block;height:100%}
-.mix .m1{background:var(--ball)} .mix .m2{background:var(--playin)} .mix .m3{background:var(--muted)} .mix .m4{background:var(--good)}
+.mix .m1{background:var(--ball)} .mix .m2{background:var(--playin)} .mix .m3{background:var(--muted)} .mix .m4{background:var(--good)} .mix .m5{background:var(--roster)}
 .mixkey{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--muted)}
 .mixkey span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:10px;height:10px;border-radius:2px;display:inline-block}
@@ -193,3 +193,24 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.82rem}
 .empty-note{color:var(--muted);font-size:.9rem;margin:0}
 .view-intro{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 32px}
 .view-intro .lede{margin:0}
+
+/* ---------- This week ---------- */
+.week-days{display:flex;flex-direction:column;gap:18px}
+.day h3{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px}
+.game{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.game .side{display:flex;align-items:baseline;gap:6px;color:var(--muted)}
+.game .side .nm{flex:1;min-width:0;font-size:.9rem}
+.game .side .nm small{font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;color:var(--muted)}
+.game .side b{font-family:var(--display);font-size:1.5rem;font-weight:700;line-height:1}
+.game .side.fav{color:var(--ink)}
+.game .odds{display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-top:2px}
+.game .odds .bar{width:70px}
+.game .note{font-size:.76rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:4px}
+.game .note.out{color:var(--bad)}
+.graded{width:100%;border-collapse:collapse;font-size:.88rem}
+.graded th,.graded td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.graded th{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.graded .l{text-align:left}
+.pick.ok{color:var(--good);font-weight:700} .pick.miss{color:var(--bad);font-weight:700}
+#weekRange{margin:4px 0 0}

@@ -145,3 +145,21 @@ def test_record_earns_some_credit(data):
     gain_b = rating[ib] - prior[ib] * Settings().evidence_games / (Settings().evidence_games + 13)
     assert gain_a > gain_b
     assert 0 < RECORD_SHARE < 0.5   # margin stays the main signal
+
+
+def test_roster_rating_uses_player_stats(data):
+    """Swapping a team's best player for a replacement-level one lowers its rating."""
+    from predictor.data_io import load_players
+    from predictor.model import ROSTER_SHARE, roster_ratings
+    teams, injuries, moves = data
+    players = load_players()
+    base, _, _ = team_ratings(teams, moves, Settings(), injuries, players)
+    i = [t.id for t in teams].index("OKC")
+    star = max((p for p in players if p["team"] == "OKC"), key=lambda p: p["bpm"] * p["mpg"])
+    worse = [dict(p, bpm=-2.0) if p is star else p for p in players]
+    after, _, _ = team_ratings(teams, moves, Settings(), injuries, worse)
+    assert after[i] < base[i]
+    r = roster_ratings(teams, players)
+    assert abs(r.mean()) < 1e-9 and 0 < ROSTER_SHARE < 0.5
+    # No player data: same as before roster ratings existed
+    assert roster_ratings(teams, []) is None

@@ -23,10 +23,11 @@ WESTERN CONFERENCE
    - **Last season (75%)**: 2025–26 net rating, regressed 30% toward average, plus an adjustment for each offseason move (`data/moves.csv`). The moves table is what makes last season's number describe this season's roster.
    - **Preseason win total (25%)**: the betting line, converted at 2.7 wins per point of margin. Lines are scaled so the league totals exactly 1,230 wins.
    - **Preseason games (0%, off by default)**: exhibition record, smoothed with a 3–3 ghost record because four or five preseason games say very little.
-2. **In-season blend.** Once games are played, each team's actual results are mixed in: 80% point differential and 20% win-loss record (turned into points), so a team that keeps closing out tight games gets a little credit without letting early-season luck take over. The preseason rating counts as 7 games of evidence by default. On the web page this is the "How much this season counts" slider: sliding right lowers that number, so this season's games count for more. With about 11 games played (mid-November) that works out to 30% last season, 10% win total and 60% games so far, and the games-so-far share keeps growing: about 85% by midseason and over 90% by April.
-3. **Injuries, game by game.** Each injury has an impact (net rating points) and a number of games out. In every simulated season the team plays weaker for exactly those games. Opponents' injuries count too. Each injury also records the games the player has already missed. His absence is already in the team's point differential, so the model adds those games back before blending, which keeps the rating on a healthy-roster footing and stops an injury from being counted twice.
-4. **Simulate.** Each remaining game is played against a random opponent with home court worth 2.5 points, and a logistic curve turns the rating gap into a win probability. Each simulated season also draws a random shock to every team's rating, sized by how uncertain that rating still is.
-5. **Seed and play in.** Teams are ranked by wins in each conference. Seeds 7 vs 8 and 9 vs 10 play, then the 7/8 loser hosts the 9/10 winner for the final playoff spot.
+2. **In-season blend.** Once games are played, each team's actual results are mixed in: 80% point differential and 20% win-loss record (turned into points), so a team that keeps closing out tight games gets a little credit without letting early-season luck take over. The preseason rating counts as 7 games of evidence by default. On the web page this is the "How much this season counts" slider: sliding right lowers that number, so this season's games count for more. With about 12 games played (mid-November) and the roster's 20% included, that works out to about 51% games so far, 20% roster, 22% last season and 7% win total, and the games-so-far share keeps growing through the season.
+3. **Current roster.** 20% of each team's rating comes from its roster today: the top 10 players by minutes, weighted by minutes and rated on Box Plus/Minus (this season blended with last). Trades, signings and players' form show up right away. Rosters and player stats refresh every morning.
+4. **Injuries, game by game.** Each injury has an impact (net rating points) and a number of games out. In every simulated season the team plays weaker for exactly those games. Opponents' injuries count too. Each injury also records the games the player has already missed. His absence is already in the team's point differential, so the model adds those games back before blending, which keeps the rating on a healthy-roster footing and stops an injury from being counted twice.
+5. **Simulate.** Each remaining game is played against a random opponent with home court worth 2.5 points, and a logistic curve turns the rating gap into a win probability. Each simulated season also draws a random shock to every team's rating, sized by how uncertain that rating still is.
+6. **Seed and play in.** Teams are ranked by wins in each conference. Seeds 7 vs 8 and 9 vs 10 play, then the 7/8 loser hosts the 9/10 winner for the final playoff spot.
 
 The output for each team is projected wins, the chance of a top 6 seed, the chance of landing in the play-in, and the overall chance of making the playoffs (top 6 or winning the play-in). Teams that have mathematically locked up a top 6 seed are marked clinched, and teams that can no longer reach the top 10 are marked eliminated (tiebreakers ignored).
 
@@ -101,6 +102,8 @@ ESPN standings feed ──► validate ──► data/standings.csv ──► ru
 
 If there were no games since the last run, nothing is committed. If the feed fails validation, the run shows a red X in the Actions tab and the last good data stays in place. You can also start a run by hand from **Actions → update standings → Run workflow**.
 
+`results/game_predictions.csv` holds a predicted score for every game, saved each morning before tipoff for the next seven days (`python -m predictor.weekly --save ...`). A game's row stops changing once its day arrives, so the "This week" tab can grade it fairly against the final score and keep a season-long record of the model's picks.
+
 `results/history.csv` has one row per team per day (projected wins, average seed, and the chance of a top 6 seed, play-in and playoffs), which makes it easy to chart how each team's odds moved over the season.
 
 ## Updating by hand
@@ -140,7 +143,8 @@ nba-playoff-predictor/
 ├── scripts/
 │   ├── update_standings.py  the daily pipeline: fetch, validate, write, rerun model
 │   └── build_web_data.py    writes docs/js/data.js from the CSVs
-├── results/                 projections.csv (latest run) and history.csv (every run), written by the pipeline
+├── results/                 projections.csv (latest run), history.csv (every run) and game_predictions.csv
+│                            (each game's pre-tipoff prediction), written by the pipeline
 ├── docs/                    the web app (GitHub Pages serves this folder)
 │   ├── index.html
 │   ├── css/styles.css

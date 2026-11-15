@@ -16,7 +16,9 @@
   let selected = "finals";
 
   // ---------- tabs ----------
-  const tabs = [["standings", $("tab-standings"), $("view-standings")], ["bracket", $("tab-bracket"), $("view-bracket")]];
+  const tabs = [["standings", $("tab-standings"), $("view-standings")], ["week", $("tab-week"), $("view-week")],
+    ["bracket", $("tab-bracket"), $("view-bracket")]];
+  const tabFromHash = () => (tabs.some(([n]) => n !== "standings" && location.hash === "#" + n) ? location.hash.slice(1) : "standings");
   function show(name, focus) {
     tabs.forEach(([n, tab, view]) => {
       const on = n === name;
@@ -25,17 +27,18 @@
       view.hidden = !on;
       if (on && focus) tab.focus();
     });
-    if (name === "bracket" && location.hash !== "#bracket") history.replaceState(null, "", "#bracket");
+    if (name !== "standings" && location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
     if (name === "standings" && location.hash) history.replaceState(null, "", location.pathname + location.search);
   }
   tabs.forEach(([n, tab], i) => {
     tab.addEventListener("click", () => show(n));
     tab.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight" || e.key === "ArrowLeft") show(tabs[(i + 1) % 2][0], true);
+      if (e.key === "ArrowRight") show(tabs[(i + 1) % tabs.length][0], true);
+      if (e.key === "ArrowLeft") show(tabs[(i + tabs.length - 1) % tabs.length][0], true);
     });
   });
-  window.addEventListener("hashchange", () => show(location.hash === "#bracket" ? "bracket" : "standings"));
-  if (location.hash === "#bracket") show("bracket");
+  window.addEventListener("hashchange", () => show(tabFromHash()));
+  if (tabFromHash() !== "standings") show(tabFromHash());
 
   // ---------- build from the latest simulation ----------
   function nickname(name) {

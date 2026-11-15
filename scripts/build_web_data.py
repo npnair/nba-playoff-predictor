@@ -42,12 +42,18 @@ def main() -> None:
 
     teams, injuries, moves = load_all()
     from predictor.data_io import load_games, load_players
+    from predictor.weekly import next_game_day, read_predictions
+    preds = read_predictions(ROOT / "results" / "game_predictions.csv")
     payload = {
         "asOf": args.as_of,
         "teams": [asdict(t) for t in teams],
         "injuries": [asdict(j) for j in injuries],
         "moves": [asdict(m) for m in moves],
         "games": [[g["date"], g["home"], g["away"], g["home_pts"], g["away_pts"]] for g in load_games()],
+        "weekStart": next_game_day(load_games()),
+        # Saved before each game was played: [date, home, away, pred_home, pred_away, home_win_prob]
+        "predictions": [[r["date"], r["home"], r["away"], int(r["pred_home"]), int(r["pred_away"]),
+                         float(r["home_win_prob"])] for r in preds],
         "players": [[p["team"], p["bref_id"], p["player"], p["pos"], p["mpg"], p["bpm"], p["minutes"],
                      p["po_adj"]]
                     for p in load_players()],
