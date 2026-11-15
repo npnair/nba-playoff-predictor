@@ -77,7 +77,7 @@ button:disabled{opacity:.6;cursor:wait}
 .hint{color:var(--muted);font-size:.88rem;margin:0;max-width:76ch}
 .mix{display:flex;height:10px;border-radius:5px;overflow:hidden;max-width:420px;background:var(--line)}
 .mix i{display:block;height:100%}
-.mix .m1{background:var(--ball)} .mix .m2{background:var(--playin)} .mix .m3{background:var(--muted)}
+.mix .m1{background:var(--ball)} .mix .m2{background:var(--playin)} .mix .m3{background:var(--muted)} .mix .m4{background:var(--good)}
 .mixkey{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--muted)}
 .mixkey span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:10px;height:10px;border-radius:2px;display:inline-block}
