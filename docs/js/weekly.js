@@ -1,4 +1,4 @@
-// "This week" tab: a predicted score for every game in the next seven days, and how the saved
+// "This week" tab: a predicted score for every game this week, and how the saved
 // predictions did once games were played. Upcoming games follow the Standings tab's inputs and
 // redraw on every simulation (the "pl:results" event). Graded games use the prediction saved
 // each morning before tipoff, so they never change after the fact.
@@ -70,36 +70,85 @@
     return rot.sort((a, b) => b.bpm - a.bpm)[0];
   }
 
-  function renderUpcoming({ teams, injuries, results, players }) {
+  // The week runs in 7-day blocks from the first saved prediction (Nov 14 - 20, Nov 21 - 27, ...), so a
+  // game stays on the page after it's played and its prediction gets graded in place.
+  const daysBetween = (a, b) => Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / 86400000);
+  const anchor = saved.length ? saved.map((p) => p.date).sort()[0] : start;
+  const weekFrom = start && anchor ? addDays(anchor, 7 * Math.floor(Math.max(0, daysBetween(anchor, start)) / 7)) : start;
+  const weekTo = weekFrom ? addDays(weekFrom, 6) : null;
+  const winner = (homeWins, g) => (homeWins ? [g.home, g.away] : [g.away, g.home]);
+
+  function summaryItem(g) {
+    if (g.kind === "upcoming") {
+      const [w, l] = winner(g.pred_home > g.pred_away, g);
+      const p = Math.max(g.home_win_prob, 1 - g.home_win_prob);
+      return `<li class="pick-line"><span class="who"><b>${esc(nickname(w))}</b> beat ${esc(nickname(l))}</span>
+        <span class="det">${Math.max(g.pred_home, g.pred_away)}–${Math.min(g.pred_home, g.pred_away)} · ${pct(p)}</span></li>`;
+    }
+    const [aw, al] = winner(g.home_pts > g.away_pts, g);
+    const final = `Final: ${esc(nickname(aw))} ${Math.max(g.home_pts, g.away_pts)}–${Math.min(g.home_pts, g.away_pts)}`;
+    if (!g.pred) return `<li class="pick-line"><span class="who"><b>${esc(nickname(aw))}</b> beat ${esc(nickname(al))}</span><span class="det">${final} · no prediction saved</span></li>`;
+    const [w, l] = winner(g.pred.pred_home > g.pred.pred_away, g);
+    return `<li class="pick-line ${g.correct ? "ok" : "miss"}"><span class="who"><span class="mark">${g.correct ? "✓" : "✗"}</span><b>${esc(nickname(w))}</b> beat ${esc(nickname(l))}</span>
+      <span class="det">${final}</span></li>`;
+  }
+
+  function gameCard(g, injuries, players) {
+    const side = (id, pts, strong, label) => `<div class="side${strong ? " fav" : ""}">
+      <span class="abbr">${id}</span><span class="nm">${esc(nickname(id))}<small>${label}</small></span><b>${pts}</b></div>`;
+    if (g.kind === "played") {
+      const homeWon = g.home_pts > g.away_pts;
+      const pred = g.pred ? `<div class="note">Predicted ${esc(nickname(g.pred.pred_home > g.pred.pred_away ? g.home : g.away))} ${Math.max(g.pred.pred_home, g.pred.pred_away)}–${Math.min(g.pred.pred_home, g.pred.pred_away)}
+        <span class="pick ${g.correct ? "ok" : "miss"}">${g.correct ? "✓ right winner" : "✗ wrong winner"}</span> · off by ${g.points_off.toFixed(1)} pts</div>` : `<div class="note">No prediction was saved for this game.</div>`;
+      return `<article class="game played${g.pred ? (g.correct ? " ok" : " miss") : ""}">
+        ${side(g.away, g.away_pts, !homeWon, "away")}${side(g.home, g.home_pts, homeWon, "home")}
+        <div class="odds"><span>Final</span></div>${pred}</article>`;
+    }
+    const homeFav = g.home_win_prob >= 0.5;
+    const outH = outFor(injuries, g.home, g.homeIndex), outA = outFor(injuries, g.away, g.awayIndex);
+    const bestH = bestHealthy(players, g.home, outH), bestA = bestHealthy(players, g.away, outA);
+    const fav = homeFav ? g.home : g.away, favP = homeFav ? g.home_win_prob : 1 - g.home_win_prob;
+    const signedBpm = (p) => `${p.bpm >= 0 ? "+" : "−"}${Math.abs(p.bpm).toFixed(1)}`;
+    const notes = [];
+    if (outA.length || outH.length) notes.push(`<div class="note out">Out: ${[...outA.map((n) => `${esc(n)} (${g.away})`), ...outH.map((n) => `${esc(n)} (${g.home})`)].join(", ")}</div>`);
+    if (bestA && bestH) notes.push(`<div class="note">Top players: ${esc(bestA.player)} ${signedBpm(bestA)} · ${esc(bestH.player)} ${signedBpm(bestH)} BPM</div>`);
+    return `<article class="game">
+      ${side(g.away, g.pred_away, !homeFav, "away")}${side(g.home, g.pred_home, homeFav, "home")}
+      <div class="odds"><span>${fav} wins ${pct(favP)}</span><span class="bar"><i style="width:${(favP * 100).toFixed(1)}%;background:${homeFav ? "var(--ball)" : "var(--playin)"}"></i></span></div>
+      ${notes.join("")}</article>`;
+  }
+
+  function renderWeek({ teams, injuries, results, players }) {
     if (!start) { $("weekDays").innerHTML = `<p class="hint">No games left on the schedule.</p>`; return; }
     const pen = M.penalties(teams, injuries);
     const ratings = {}, penBy = {};
     teams.forEach((t, i) => { ratings[t.id] = results.ratings[i].rating; penBy[t.id] = Array.from(pen[i]); });
-    const preds = M.predictGames(ratings, penBy, games, start);
-    $("weekRange").textContent = `${fmtShort(start)} – ${fmtShort(M.weekEnd(start))} · ${preds.length} games`;
+    // Upcoming games: live predictions that follow the Standings tab's inputs
+    const upcoming = M.predictGames(ratings, penBy, games, start, daysBetween(start, weekTo) + 1).map((p) => ({ ...p, kind: "upcoming" }));
+    // Played games this week: the prediction saved before tipoff, graded against the final
+    const graded = Object.fromEntries(M.grade(saved, games).map((g) => [`${g.date}|${g.home}|${g.away}`, g]));
+    const played = games.filter((g) => M.isPlayed(g) && g.date >= weekFrom && g.date <= weekTo).map((g) => {
+      const gr = graded[`${g.date}|${g.home}|${g.away}`];
+      return { ...g, kind: "played", pred: gr || null, correct: gr ? gr.correct : null, points_off: gr ? gr.points_off : null };
+    });
+    const all = [...played, ...upcoming];
+    const right = played.filter((g) => g.pred && g.correct).length, total = played.filter((g) => g.pred).length;
+    $("weekRange").textContent = `${fmtShort(weekFrom)} – ${fmtShort(weekTo)} · ${all.length} games${total ? ` · picks ${right}–${total - right} so far` : ""}`;
 
     const days = {};
-    preds.forEach((p) => (days[p.date] = days[p.date] || []).push(p));
-    $("weekDays").innerHTML = Object.entries(days).map(([d, list]) => `
-      <section class="day"><h3>${esc(fmtDay(d))}</h3><div class="games">${list.map((p) => {
-        const homeFav = p.home_win_prob >= 0.5;
-        const outH = outFor(injuries, p.home, p.homeIndex), outA = outFor(injuries, p.away, p.awayIndex);
-        const bestH = bestHealthy(players, p.home, outH), bestA = bestHealthy(players, p.away, outA);
-        const fav = homeFav ? p.home : p.away, favP = homeFav ? p.home_win_prob : 1 - p.home_win_prob;
-        const line = (id, pts, isFav, side) => `<div class="side${isFav ? " fav" : ""}">
-          <span class="abbr">${id}</span><span class="nm">${esc(nickname(id))}<small>${side}</small></span><b>${pts}</b></div>`;
-        const notes = [];
-        if (outA.length || outH.length) notes.push(`<div class="note out">Out: ${[...outA.map((n) => `${esc(n)} (${p.away})`), ...outH.map((n) => `${esc(n)} (${p.home})`)].join(", ")}</div>`);
-        if (bestA && bestH) notes.push(`<div class="note">Top players: ${esc(bestA.player)} ${bestA.bpm >= 0 ? "+" : "−"}${Math.abs(bestA.bpm).toFixed(1)} · ${esc(bestH.player)} ${bestH.bpm >= 0 ? "+" : "−"}${Math.abs(bestH.bpm).toFixed(1)} BPM</div>`);
-        return `<article class="game">
-          ${line(p.away, p.pred_away, !homeFav, "away")}
-          ${line(p.home, p.pred_home, homeFav, "home")}
-          <div class="odds"><span>${fav} wins ${pct(favP)}</span><span class="bar"><i style="width:${(favP * 100).toFixed(1)}%;background:${homeFav ? "var(--ball)" : "var(--playin)"}"></i></span></div>
-          ${notes.join("")}
-        </article>`;
-      }).join("")}</div></section>`).join("");
+    all.forEach((g) => (days[g.date] = days[g.date] || []).push(g));
+    $("weekDays").innerHTML = Object.keys(days).sort().map((d) => {
+      const list = days[d];
+      const dayGraded = list.filter((g) => g.kind === "played" && g.pred);
+      const dayRight = dayGraded.filter((g) => g.correct).length;
+      return `<section class="day"><h3>${esc(fmtDay(d))}${dayGraded.length ? ` <span class="dayrec">${dayRight}–${dayGraded.length - dayRight}</span>` : ""}</h3>
+        <div class="day-body">
+          <div class="games">${list.map((g) => gameCard(g, injuries, players)).join("")}</div>
+          <aside class="day-sum"><h4>${list.some((g) => g.kind === "upcoming") ? "Predicted winners" : "Results"}</h4><ul>${list.map(summaryItem).join("")}</ul></aside>
+        </div></section>`;
+    }).join("");
   }
 
   renderGraded();
-  window.addEventListener("pl:results", (e) => renderUpcoming(e.detail));
+  window.addEventListener("pl:results", (e) => renderWeek(e.detail));
 })();
