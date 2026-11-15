@@ -24,7 +24,7 @@ WESTERN CONFERENCE
    - **Preseason win total (25%)**: the betting line, converted at 2.7 wins per point of margin. Lines are scaled so the league totals exactly 1,230 wins.
    - **Preseason games (0%, off by default)**: exhibition record, smoothed with a 3–3 ghost record because four or five preseason games say very little.
 2. **In-season blend.** Once games are played, each team's actual point differential is mixed in. The preseason rating counts as 7 games of evidence by default. With about 11 games played (mid-November) that works out to 30% last season, 10% win total and 60% games so far, and the games-so-far share keeps growing: about 85% by midseason and over 90% by April.
-3. **Injuries, game by game.** Each injury has an impact (net rating points) and a number of games out. In every simulated season the team plays weaker for exactly those games. Opponents' injuries count too.
+3. **Injuries, game by game.** Each injury has an impact (net rating points) and a number of games out. In every simulated season the team plays weaker for exactly those games. Opponents' injuries count too. Each injury also records the games the player has already missed. His absence is already in the team's point differential, so the model adds those games back before blending, which keeps the rating on a healthy-roster footing and stops an injury from being counted twice.
 4. **Simulate.** Each remaining game is played against a random opponent with home court worth 2.5 points, and a logistic curve turns the rating gap into a win probability. Each simulated season also draws a random shock to every team's rating, sized by how uncertain that rating still is.
 5. **Seed and play in.** Teams are ranked by wins in each conference. Seeds 7 vs 8 and 9 vs 10 play, then the 7/8 loser hosts the 9/10 winner for the final playoff spot.
 
@@ -110,7 +110,7 @@ Injuries and roster moves need judgment, so they are not automated. All inputs a
 | File | What it holds | How often to update |
 |---|---|---|
 | `standings.csv` | 2026–27 W, L and average point differential per game | Automatic, daily |
-| `injuries.csv` | Player, impact in points, games still out | Weekly, as players return or get hurt |
+| `injuries.csv` | Player, impact in points, games still out, games missed so far (team games played minus his games played) | Weekly, as players return or get hurt |
 | `moves.csv` | Offseason and in-season roster changes with impact in points | After trades |
 | `teams.csv` | Names, conferences, win totals, 2025–26 record and net rating, preseason record | Once per season |
 | `games.csv`, `players.csv` | Game results and rostered players' stats for the bracket | Automatic, daily |

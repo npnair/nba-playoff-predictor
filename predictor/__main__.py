@@ -27,7 +27,7 @@ def print_conference(conf: str, rows: list[dict]) -> None:
         if k in (7, 11):
             print("    " + "-" * 86)
         tag = {"clinched": " *", "eliminated": " x"}.get(r["status"], "")
-        inj = f"-{r['injury_wins_lost']:.1f}" if r["injury_wins_lost"] >= 0.05 else "-"
+        inj = f"{-r['injury_wins_lost']:+.1f}" if abs(r["injury_wins_lost"]) >= 0.05 else "-"
         print(
             f"{k:>2}  {r['name'] + tag:<24}{r['record']:>7}{r['rating']:>+7.1f}{r['moves']:>+7.1f}{inj:>6}"
             f"{r['proj_wins']:>7.1f}{pct(r['top6']):>7}{pct(r['play_in']):>8}{pct(r['playoffs']):>10}"
@@ -89,7 +89,7 @@ def print_bracket(teams, injuries, moves, settings, results) -> None:
     if not players:
         print("\nNo player data yet (data/players.csv); run scripts/update_standings.py first.")
         return
-    rating, _, _ = team_ratings(teams, moves, settings)
+    rating, _, _ = team_ratings(teams, moves, settings, injuries)
     pen = injury_penalties(teams, injuries)
     ratings = {t.id: float(rating[i] - pen[i, t.games_left]) for i, t in enumerate(teams)}
     left = {t.id: t.games_left for t in teams}

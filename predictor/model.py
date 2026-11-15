@@ -5,6 +5,8 @@ Pipeline:
    blend of last season's net rating adjusted for offseason moves, the preseason win
    total line, and the preseason exhibition record.
 2. Blend with the 2026-27 point differential, weighted by games played.
+   Games a player has already missed are added back first, so the blended rating describes a
+   healthy roster and an injury is never counted twice.
 3. Simulate every remaining game, lowering a team's rating while injured players are out.
 4. Seed each conference by wins, then play the 7-10 play-in tournament.
 """
@@ -68,8 +70,23 @@ def components(teams: list[Team], moves: list[Move]) -> dict[str, np.ndarray]:
     }
 
 
-def team_ratings(teams: list[Team], moves: list[Move], s: Settings) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Return (rating, rating_sd, preseason_prior) arrays, one entry per team."""
+def healthy_bonus(teams: list[Team], injuries: list[Injury]) -> np.ndarray:
+    """Points of margin, summed over games, that each team lost to absences so far this season.
+
+    The 2026-27 point diff already includes these absences, but the preseason prior assumes a
+    healthy roster. Adding them back puts both on the same healthy footing before blending.
+    """
+    idx = {t.id: i for i, t in enumerate(teams)}
+    out = np.zeros(len(teams))
+    for j in injuries:
+        t = teams[idx[j.team]]
+        out[idx[j.team]] += j.impact * min(j.games_missed, t.games_played)
+    return out
+
+
+def team_ratings(teams: list[Team], moves: list[Move], s: Settings,
+                 injuries: list[Injury] = ()) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return (rating, rating_sd, preseason_prior) arrays, one entry per team. Ratings are healthy."""
     a, b, c = blend_weights(s)
     comp = components(teams, moves)
     raw = a * comp["last"] + b * comp["line"] + c * comp["preseason"]
@@ -82,7 +99,7 @@ def team_ratings(teams: list[Team], moves: list[Move], s: Settings) -> tuple[np.
         else (t.w / t.games_played - 0.5) * GAMES / WINS_PER_POINT
         for t in teams
     ])
-    rating = (prior * k + observed * gp) / (k + gp)
+    rating = (prior * k + observed * gp + healthy_bonus(teams, injuries)) / (k + gp)
     sd = RATING_SD * np.sqrt(k / (k + gp))
     return rating, sd, prior
 
@@ -103,9 +120,15 @@ def win_prob(a, b, home):
     return 1.0 / (1.0 + np.exp(-((a - b) + edge) / LOGISTIC_SCALE))
 
 
-def injury_wins_lost(team: Team, injuries: list[Injury]) -> float:
+def injury_wins_lost(team: Team, injuries: list[Injury], evidence_games: float = Settings.evidence_games) -> float:
+    """Net wins the projection loses to injuries: games still to miss, minus the rating added back
+    for games already missed (that boost applies to every remaining game)."""
     per_point = WINS_PER_POINT / GAMES
-    return sum(j.impact * min(team.games_left, j.games_out) * per_point for j in injuries if j.team == team.id)
+    left, gp = team.games_left, team.games_played
+    return sum(
+        j.impact * per_point * (min(left, j.games_out) - left * min(j.games_missed, gp) / (evidence_games + gp))
+        for j in injuries if j.team == team.id
+    )
 
 
 def clinch_status(team: Team, teams: list[Team]) -> str:
@@ -125,7 +148,7 @@ def simulate(teams: list[Team], injuries: list[Injury], moves: list[Move], s: Se
     s = s or Settings()
     rng = np.random.default_rng(s.seed)
     n, N = len(teams), s.sims
-    rating, sd, prior = team_ratings(teams, moves, s)
+    rating, sd, prior = team_ratings(teams, moves, s, injuries)
     pen = injury_penalties(teams, injuries)
     left = np.array([t.games_left for t in teams])
 
@@ -180,7 +203,7 @@ def simulate(teams: list[Team], injuries: list[Injury], moves: list[Move], s: Se
             "record": f"{t.w}-{t.l}",
             "rating": round(float(rating[i]), 2),
             "moves": round(float(moved[i]), 2),
-            "injury_wins_lost": round(injury_wins_lost(t, injuries), 2),
+            "injury_wins_lost": round(injury_wins_lost(t, injuries, s.evidence_games), 2),
             "proj_wins": round(float(wins[:, i].mean()), 1),
             "top6": float(top6[i] / N),
             "play_in": float(play_in[i] / N),

@@ -41,6 +41,7 @@ class Injury:
     player: str
     impact: float    # net rating points the team loses while the player is out
     games_out: int   # remaining games the player is expected to miss
+    games_missed: int = 0   # games already missed this season (their absence is in the point diff)
 
 
 @dataclass
@@ -88,7 +89,8 @@ def load_injuries(data_dir: Path = DATA_DIR) -> list[Injury]:
     if not path.exists():
         return []
     return [
-        Injury(r["team"].strip().upper(), r["player"].strip(), float(r["impact"]), int(float(r["games_out"])))
+        Injury(r["team"].strip().upper(), r["player"].strip(), float(r["impact"]), int(float(r["games_out"])),
+               int(float(r.get("games_missed") or 0)))
         for r in _rows(path)
     ]
 
@@ -116,8 +118,8 @@ def validate(teams: list[Team], injuries: list[Injury], moves: list[Move]) -> No
         if item.team not in ids:
             raise ValueError(f"Unknown team id {item.team!r} in {type(item).__name__.lower()} list")
     for j in injuries:
-        if j.impact < 0 or j.games_out < 0:
-            raise ValueError(f"{j.player}: impact and games_out must be zero or more")
+        if j.impact < 0 or j.games_out < 0 or j.games_missed < 0:
+            raise ValueError(f"{j.player}: impact, games_out and games_missed must be zero or more")
 
 
 def load_all(data_dir: Path = DATA_DIR) -> tuple[list[Team], list[Injury], list[Move]]:

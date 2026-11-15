@@ -36,7 +36,14 @@
     }));
   }
 
-  function ratings(teams, moves, s) {
+  // Margin points (summed over games) each team lost to absences so far. The point diff already
+  // includes them but the preseason prior assumes a healthy roster, so they are added back.
+  function healthyBonus(t, injuries) {
+    return injuries.filter((j) => j.team === t.id)
+      .reduce((sum, j) => sum + (+j.impact || 0) * Math.min(Math.max(0, +j.games_missed || 0), gamesPlayed(t)), 0);
+  }
+
+  function ratings(teams, moves, s, injuries = []) {
     const [a, b, c] = blendWeights(s);
     const raw = components(teams, moves).map((m) => a * m.last + b * m.line + c * m.preseason);
     const mean = raw.reduce((x, y) => x + y, 0) / raw.length;
@@ -47,7 +54,7 @@
       const observed = t.point_diff || !gp ? t.point_diff : (t.w / gp - 0.5) * GAMES / WINS_PER_POINT;
       return {
         prior,
-        rating: (prior * k + observed * gp) / (k + gp),
+        rating: (prior * k + observed * gp + healthyBonus(t, injuries)) / (k + gp),
         sd: RATING_SD * Math.sqrt(k / (k + gp)),
       };
     });
@@ -76,11 +83,16 @@
     return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
   }
 
-  function injuryWinsLost(team, injuries) {
-    const left = gamesLeft(team);
+  // Net wins lost: games still to miss, minus the rating added back for games already missed.
+  function injuryWinsLost(team, injuries, evidenceGames = 7) {
+    const left = gamesLeft(team), gp = gamesPlayed(team), k = +evidenceGames;
     return injuries
       .filter((j) => j.team === team.id)
-      .reduce((sum, j) => sum + (+j.impact || 0) * Math.min(left, Math.max(0, j.games_out)) * (WINS_PER_POINT / GAMES), 0);
+      .reduce((sum, j) => {
+        const missed = Math.min(Math.max(0, +j.games_missed || 0), gp);
+        const games = Math.min(left, Math.max(0, j.games_out)) - left * missed / (k + gp);
+        return sum + (+j.impact || 0) * games * (WINS_PER_POINT / GAMES);
+      }, 0);
   }
 
   // "clinched" a top-6 seed, "eliminated" from the top 10, or "". Ignores tiebreakers.
@@ -93,7 +105,7 @@
   }
 
   function simulate(teams, injuries, moves, s, rand = Math.random) {
-    const R = ratings(teams, moves, s);
+    const R = ratings(teams, moves, s, injuries);
     const P = penalties(teams, injuries);
     const n = teams.length, N = +s.sims;
     const tally = teams.map(() => ({ top6: 0, playIn: 0, playoffs: 0, seed: 0, wins: 0 }));
@@ -149,7 +161,7 @@
   }
 
   global.PL_MODEL = {
-    GAMES, gamesPlayed, gamesLeft, blendWeights, moveTotal, components, ratings,
+    GAMES, gamesPlayed, gamesLeft, blendWeights, moveTotal, components, healthyBonus, ratings,
     penalties, winProb, simulate, injuryWinsLost, clinchStatus,
   };
 })(typeof window !== "undefined" ? window : globalThis);

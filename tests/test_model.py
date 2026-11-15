@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from predictor.data_io import Injury, Move, load_all, validate
-from predictor.model import Settings, clinch_status, simulate, team_ratings
+from predictor.model import Settings, clinch_status, injury_wins_lost, simulate, team_ratings
 
 
 @pytest.fixture(scope="module")
@@ -93,3 +93,36 @@ def test_validate_rejects_bad_record(data):
     teams[0].w = 83
     with pytest.raises(ValueError):
         validate(teams, [], [])
+
+
+def test_games_already_missed_are_not_counted_twice(data):
+    """A player out since opening night: his absence is already in the point diff, so the
+    rating adds it back and only the remaining games he misses lower the team."""
+    teams, _, moves = data
+    played = copy.deepcopy(teams)
+    sac = next(t for t in played if t.id == "SAC")
+    sac.w, sac.l, sac.point_diff = 5, 5, -3.0
+    i = [t.id for t in played].index("SAC")
+    s = Settings()
+    k = s.evidence_games
+
+    star = Injury("SAC", "Test star", 4.0, 20, games_missed=10)
+    healthy, _, prior = team_ratings(played, moves, s, [star])
+    # Shorthanded margin of -3 over 10 games, worth -3 + 4 = +1 with him
+    assert healthy[i] == pytest.approx((prior[i] * k + 1.0 * 10) / (k + 10))
+
+    # Nothing missed yet: no add-back, same as before this change
+    fresh = Injury("SAC", "Test star", 4.0, 20)
+    plain, _, _ = team_ratings(played, moves, s)
+    assert team_ratings(played, moves, s, [fresh])[0][i] == pytest.approx(plain[i])
+
+    # Net wins lost shrink once the games he already missed are credited back
+    assert injury_wins_lost(sac, [star], k) < injury_wins_lost(sac, [fresh], k)
+    # A player who missed a long stretch but is back next game is a net gain
+    assert injury_wins_lost(sac, [Injury("SAC", "Back now", 4.0, 0, games_missed=10)], k) < 0
+
+
+def test_games_missed_column_is_optional(tmp_path):
+    (tmp_path / "injuries.csv").write_text("team,player,impact,games_out\nSAC,Someone,1.0,5\n")
+    from predictor.data_io import load_injuries
+    assert load_injuries(tmp_path)[0].games_missed == 0

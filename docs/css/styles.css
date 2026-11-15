@@ -45,7 +45,7 @@ td.team{text-align:left;width:100%}
 .tname{color:var(--muted);font-size:.86rem}
 .rec,.mono{font-family:var(--mono);font-size:.8rem}
 .inj{font-family:var(--mono);font-size:.8rem;color:var(--bad)}
-.inj.zero{color:var(--muted)}
+.inj.zero{color:var(--muted)} .inj.gain{color:var(--good)}
 .pw{font-family:var(--display);font-weight:700;font-size:1.1rem}
 tr.top td.seed{color:var(--ball)}
 tr.pi td.seed{color:var(--playin)}
