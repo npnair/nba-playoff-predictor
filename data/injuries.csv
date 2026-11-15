@@ -1,64 +1,61 @@
 team,player,impact,games_out,games_missed
 ATL,"Henri Veesaar (ACL, season)",0.3,82,13
-ATL,"Mouhamed Gueye (foot fracture, ~Nov 20)",0.6,5,13
-ATL,"Asa Newell (toe, day to day)",0.3,2,8
-BKN,"Egor Demin (out, no timeline)",0.5,2,6
-CHA,"Kon Knueppel (hamstring, re-eval ~Dec 8)",2.5,13,11
-CHA,"Dennis Schroder (hamstring, re-eval ~Nov 22)",0.8,6,3
-CHA,"Brandon Miller (hip, day to day)",1.5,2,2
-CHA,Grant Williams (hamstring),0.8,2,11
-CLE,Sam Merrill (elbow),0.5,2,4
-CLE,Jaylon Tyson (ankle),0.5,2,6
-DAL,"Dereck Lively II (foot, unclear)",1.5,5,12
-DEN,"Julian Strawther (knee, ~late Nov)",0.5,9,10
-DET,"Jalen Duren (hamstring, re-eval ~Nov 22)",2.0,6,9
-DET,"Isaiah Joe (hip, ~Nov 17)",0.8,3,8
-GSW,"Jimmy Butler III (ACL, Jan–Feb)",3.0,31,13
+ATL,"Mouhamed Gueye (foot, re-eval ~Dec 12)",0.6,8,13
+ATL,"Asa Newell (toe, ~Nov 20)",0.3,2,8
+CHA,"Kon Knueppel (hamstring, re-eval ~Dec 12)",2.5,8,11
+CHA,"Dennis Schroder (hamstring, re-eval ~Nov 25)",0.8,4,3
+CHI,"Caleb Wilson (hand, 4–6 wks)",0.2,10,1
+CLE,"Evan Mobley (toe, out Nov 14)",2.2,1,1
+CLE,"Sam Merrill (elbow, ~Nov 16)",0.5,1,4
+DAL,"Dereck Lively II (foot, ~Nov 18)",1.5,2,12
+DEN,"Julian Strawther (knee, ~Nov 29)",0.5,7,10
+DET,"Isaiah Joe (hip, ~Nov 17)",0.8,1,8
+DET,"Jalen Duren (hamstring, re-eval ~Nov 24)",2.0,5,9
+GSW,"Stephen Curry (oblique tear, re-eval late Nov, ~Dec 12)",4.3,8,3
+GSW,"Brandon Williams (hamstring, ~Nov 22)",0.5,3,3
 GSW,"Kristaps Porzingis (stepped away, indefinite)",1.5,25,13
 GSW,"Moses Moody (patellar tendon, Dec–Jan)",0.8,19,13
-GSW,"Will Richard (thumb UCL tear, indefinite)",0.5,24,1
-HOU,"Steven Adams (calf, no timetable)",0.8,5,12
-HOU,Clint Capela (ankle),0.5,2,7
-IND,"Tyrese Haliburton (hamstring, no timetable)",3.0,4,9
-IND,"Ben Sheppard (meniscus surgery, months)",0.3,25,12
-IND,"Johnny Furphy (ACL, rehab)",0.3,25,13
-LAC,"Brandon Ingram (Achilles/heel, unclear)",1.5,3,11
-LAC,"Bradley Beal (knee, ~late Nov)",1.0,9,11
+GSW,"Jimmy Butler III (ACL, Jan–Feb)",3.0,31,13
+IND,"Tyrese Haliburton (hamstring, ~Nov 22)",3.0,3,9
+IND,"Johnny Furphy (knee, ~Jan)",0.3,25,13
+IND,"Ben Sheppard (meniscus surgery, ~Jan)",0.3,25,12
+LAC,"Brandon Ingram (Achilles, ~Nov 19)",1.5,2,11
+LAC,"Bradley Beal (knee, ~Nov 29)",1.0,7,11
 LAC,"Jordan Miller (rotator cuff, ~Mar)",0.3,53,11
-LAC,"Isaiah Jackson (groin, day to day)",0.3,1,1
-MEM,Scotty Pippen Jr. (lumbar disc),0.5,3,7
-MEM,Isaiah Stewart (knee bone bruise),0.8,2,3
-MIN,"Anthony Edwards (knee scope, ~late Dec)",3.5,19,8
+MEM,"Zach Edey (ankle, out Nov 14)",0.3,1,2
+MEM,"Quinten Post (concussion, out Nov 14)",0.2,1,4
+MEM,"Scotty Pippen Jr. (back, ~Nov 21)",0.5,4,7
+MIA,"Klay Thompson (ankle, out Nov 14)",0.4,1,1
+MIA,"Pelle Larsson (illness, out Nov 14)",0.2,1,1
+MIN,"Anthony Edwards (knee scope, ~Dec 21)",3.5,15,8
 MIN,"Donte DiVincenzo (Achilles, ~Apr)",1.0,67,12
-NOP,Trey Murphy III (knees),1.5,2,4
-NOP,"Yves Missi (knee bone bruise, ~Nov 16)",0.5,3,11
-OKC,"Chet Holmgren (patellar tendon, 8–10 wks)",2.5,25,10
-OKC,"Jalen Williams (leg fracture, ~Mar)",2.0,53,10
+NOP,"Dejounte Murray (ankle, ~Nov 20)",0.5,3,4
+NOP,"Trey Murphy III (knee, out Nov 14)",1.5,1,4
+NOP,"Yves Missi (knee, out Nov 14)",0.5,1,11
+NOP,"Trendon Watford (ankle, out Nov 14)",0.2,1,7
+NOP,"Bryce McGowens (elbow, out Nov 14)",0.2,1,6
+OKC,"Chet Holmgren (patellar tendon, ~Jan)",2.5,25,10
+OKC,"Jalen Williams (fibula fracture, ~Mar)",2.0,53,10
 OKC,"Cason Wallace (shoulder surgery, ~Mar)",1.0,53,10
-OKC,Thomas Sorber (knee),0.3,2,13
-OKC,"Otega Oweh (Achilles, season)",0.3,82,13
-ORL,"Paolo Banchero (high ankle, ~Nov 22)",2.5,6,10
-ORL,"Jalen Suggs (knee bone bruise, re-eval)",1.2,3,8
-ORL,"Noah Penda (hamstring, ~Nov 18)",0.3,4,12
-ORL,Jonathan Isaac (knee),0.3,2,12
-PHI,"Dominick Barlow (back, ~Nov 18)",0.3,4,13
-PHI,Adem Bona (back),0.5,1,4
+OKC,"Thomas Sorber (knee, ~Nov 20)",0.3,2,13
+OKC,"Jaylin Williams (back, indefinite)",0.4,3,6
+ORL,"Paolo Banchero (high ankle, ~Nov 22)",2.5,3,10
+ORL,"Noah Penda (hamstring, ~Nov 18)",0.3,1,12
+PHI,"Dominick Barlow (back, ~Nov 18)",0.3,2,13
+PHI,"Adem Bona (back, re-eval ~Nov 18)",0.5,2,4
 PHI,"Ariel Hukporti (Achilles, season)",0.2,82,13
-PHX,"Mark Williams (shoulder, ~Feb)",1.5,40,11
+PHX,"Mark Williams (shoulder, ~Feb)",1.5,36,11
 POR,"Ja Morant (hamstring, ~Dec 1)",1.5,10,8
-POR,"Vit Krejci (leg fracture, ~Jan)",0.5,25,5
+POR,"Vit Krejci (ankle surgery, ~Jan 12)",0.5,24,5
 POR,"Shaedon Sharpe (meniscus, ~Mar)",2.0,53,12
-SAC,Maxime Raynaud (knee),1.0,2,12
 SAC,"Ben Simmons (Achilles, season)",0.3,82,12
-SAS,"Jayden Quaintance (knee surgery, ~Dec)",0.3,11,13
-SAS,Tobias Harris (calf),0.8,2,13
-SAS,"Devin Vassell (groin, day to day)",1.0,1,2
-TOR,"Kawhi Leonard (knee swelling, re-eval)",3.0,6,10
-TOR,Nate Bittle (avulsion fracture),0.5,2,12
-TOR,"Scottie Barnes (groin, day to day)",2.5,1,4
-UTA,"Jaren Jackson Jr. (MCL, 6–8 wks)",1.5,16,9
-UTA,"Jusuf Nurkic (foot, re-eval ~Nov 20)",1.0,5,13
-WAS,"Reece Beekman (AC joint, ~Dec 3)",0.3,11,12
-WAS,"Justin Champagnie (foot, months)",0.5,50,9
-WAS,"Tristan Vukcevic (hip, ~Nov 16)",0.3,3,13
+SAS,"Tobias Harris (calf, ~Nov 19)",0.8,2,13
+SAS,"Jayden Quaintance (knee, ~Dec 3)",0.3,9,13
+TOR,"Kawhi Leonard (knee, ~Nov 23)",3.0,4,10
+UTA,"Lauri Markkanen (hand fracture, ~Jan 4)",1.7,21,5
+UTA,"Jusuf Nurkic (foot, re-eval ~Nov 20)",1.0,3,13
+UTA,"Jaren Jackson Jr. (MCL, ~Dec 14)",1.5,11,9
+WAS,"Tristan Vukcevic (hip, ~Nov 16)",0.3,1,13
+WAS,"Reece Beekman (AC joint, ~Dec 3)",0.3,8,12
+WAS,"Justin Champagnie (foot, ~Feb 25)",0.5,44,9
 WAS,"Jamir Watkins (ACL, ~Apr)",0.3,67,13
