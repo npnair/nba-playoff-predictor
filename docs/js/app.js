@@ -65,14 +65,16 @@
   }
   function showWeights() {
     const [a, b, c] = M.blendWeights(settings());
-    [["vLast", "mix1", a], ["vLine", "mix2", b], ["vPre", "mix3", c]].forEach(([label, bar, v]) => {
-      $(label).textContent = Math.round(v * 100) + "%";
-      $(bar).style.width = v * 100 + "%";
-    });
     $("kVal").textContent = $("kRange").value;
     // Overall mix for an average team today, games so far included
     const gp = teams.reduce((s, t) => s + M.gamesPlayed(t), 0) / teams.length, k = +$("kRange").value;
     const g = gp / (gp + k), pr = 1 - g, r = (v) => Math.round(v * 100) + "%";
+    [["vLast", "mix1", a], ["vLine", "mix2", b], ["vPre", "mix3", c]].forEach(([label, bar, v]) => {
+      $(label).textContent = Math.round(v * 100) + "%";
+      $(bar).style.width = pr * v * 100 + "%";
+    });
+    $("mix4").style.width = g * 100 + "%";
+    $("mixkeyGames").style.display = gp ? "" : "none";
     $("todayMix").textContent = gp ? `Today's mix (about ${Math.round(gp)} games played): ${r(pr * a)} last season · ${r(g)} games so far · ${r(pr * b)} win total${c * pr >= 0.005 ? ` · ${r(pr * c)} preseason games` : ""}.` : "";
   }
 
