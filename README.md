@@ -162,7 +162,7 @@ nba-playoff-predictor/
 - 2025–26 records and net ratings: [Basketball Reference](https://www.basketball-reference.com/leagues/NBA_2026_ratings.html)
 - 2026–27 win totals: DraftKings lines as published by [Sports Illustrated](https://www.si.com/betting/nba-win-total-predictions-for-every-team-in-2026-27-season-thunder-spurs-only-teams-projected-to-win-60-games) on Oct 15, 2026
 - 2026 preseason records: [RealGM](https://basketball.realgm.com/nba/preseason/standings)
-- Injury statuses: [ESPN](https://www.espn.com/nba/injuries) and the NBA's official injury report, Nov 9, 2026
+- Injury statuses: [ESPN](https://www.espn.com/nba/injuries), Nov 14, 2026
 - 2026–27 standings (updated daily): ESPN's public standings feed, which is unofficial and may change without notice
 
 The impact values for injuries and roster moves are judgment-based estimates, not measured stats. They are meant to be edited.
