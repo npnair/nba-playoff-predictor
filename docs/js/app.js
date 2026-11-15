@@ -20,6 +20,13 @@
   const SETTINGS_VERSION = 3;
 
   const $ = (id) => document.getElementById(id);
+  // Saved edits only apply to the exact data they were made on. The label alone isn't enough: a
+  // same-day data fix (like a new injury list) keeps the label, so fingerprint the data too.
+  const DATA_VERSION = (() => {
+    let h = 2166136261;
+    for (const ch of JSON.stringify([DATA.asOf, DATA.teams, DATA.injuries, DATA.moves])) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    return DATA.asOf + "#" + (h >>> 0).toString(36);
+  })();
   const evidenceGames = () => K_FLIP - +$("kRange").value;
   const clone = (x) => JSON.parse(JSON.stringify(x));
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -43,7 +50,7 @@
       if (s.settingsVersion === SETTINGS_VERSION) SLIDERS.concat(["simSel"]).forEach((k) => { if (s[k] != null) $(k).value = s[k]; });
       // Edits to the data only apply to the data they were made on. Once the daily pipeline
       // publishes newer standings, the visitor sees the new data instead of their old copy.
-      if (s.dataVersion !== DATA.asOf) return;
+      if (s.dataVersion !== DATA_VERSION) return;
       if (Array.isArray(s.teams)) s.teams.forEach((x) => {
         const t = teams.find((t) => t.id === x.id);
         if (t) TEAM_FIELDS.forEach(([f]) => { if (x[f] != null && !isNaN(+x[f])) t[f] = +x[f]; });
@@ -57,7 +64,7 @@
   }
   function save() {
     try {
-      const s = { dataVersion: DATA.asOf, settingsVersion: SETTINGS_VERSION, teams, injuries, moves };
+      const s = { dataVersion: DATA_VERSION, settingsVersion: SETTINGS_VERSION, teams, injuries, moves };
       SLIDERS.concat(["asof", "simSel"]).forEach((k) => { s[k] = $(k).value; });
       localStorage.setItem(STORE_KEY, JSON.stringify(s));
     } catch (e) { /* ignore */ }
