@@ -21,6 +21,7 @@
 
   <nav class="tabs" role="tablist" aria-label="Views">
     <button type="button" role="tab" id="tab-standings" aria-controls="view-standings" aria-selected="true">Standings</button>
+    <button type="button" role="tab" id="tab-week" aria-controls="view-week" aria-selected="false" tabindex="-1">This week</button>
     <button type="button" role="tab" id="tab-bracket" aria-controls="view-bracket" aria-selected="false" tabindex="-1">Playoff bracket</button>
   </nav>
 
@@ -46,9 +47,9 @@
       <div class="field"><label for="wLine">Preseason win total: <span id="vLine"></span></label><input type="range" id="wLine" min="0" max="100" value="25"></div>
       <div class="field"><label for="wPre">Preseason games: <span id="vPre"></span></label><input type="range" id="wPre" min="0" max="100" value="0"></div>
     </div>
-    <div class="mix" aria-hidden="true"><i class="m4" id="mix4"></i><i class="m1" id="mix1"></i><i class="m2" id="mix2"></i><i class="m3" id="mix3"></i></div>
-    <div class="mixkey"><span id="mixkeyGames"><i class="dot" style="background:var(--good)"></i>This season's games (mostly point margin, some W-L)</span><span><i class="dot" style="background:var(--ball)"></i>Last season net rating, regressed 30%, plus offseason moves</span><span><i class="dot" style="background:var(--playin)"></i>Win total line (prices in trades and signings)</span><span><i class="dot" style="background:var(--muted)"></i>Preseason W-L</span></div>
-    <p class="hint">The bar shows the full mix for today. The three sliders split up the pre-season share between them. The green share for this season's games is set by the "How much this season counts" slider below and grows as the season goes on.</p>
+    <div class="mix" aria-hidden="true"><i class="m4" id="mix4"></i><i class="m5" id="mix5"></i><i class="m1" id="mix1"></i><i class="m2" id="mix2"></i><i class="m3" id="mix3"></i></div>
+    <div class="mixkey"><span id="mixkeyGames"><i class="dot" style="background:var(--good)"></i>This season's games (mostly point margin, some W-L)</span><span id="mixkeyRoster"><i class="dot" style="background:var(--roster)"></i>Current roster's player stats (top 10 by minutes, BPM)</span><span><i class="dot" style="background:var(--ball)"></i>Last season net rating, regressed 30%, plus offseason moves</span><span><i class="dot" style="background:var(--playin)"></i>Win total line (prices in trades and signings)</span><span><i class="dot" style="background:var(--muted)"></i>Preseason W-L</span></div>
+    <p class="hint">The bar shows the full mix for today. The purple slice is a fixed 20% from the current roster's player stats. The three sliders split up the pre-season share. The green share for this season's games is set by the "How much this season counts" slider below and grows as the season goes on.</p>
     <div class="controls">
       <div class="field"><label for="kRange" title="Slide right to trust this season's games more. Behind the scenes, the pre-season rating is worth as many games as shown in brackets.">How much this season counts: <span id="kVal"></span></label><input type="range" id="kRange" min="3" max="60" step="1" value="56"><span class="ends"><span>Less</span><span>More</span></span></div>
       <div class="field"><label for="simSel">Simulations</label><select id="simSel"><option>2000</option><option selected>5000</option><option>10000</option></select></div>
@@ -109,6 +110,28 @@
 
   </div>
 
+  <div class="view" id="view-week" role="tabpanel" aria-labelledby="tab-week" hidden>
+    <section class="bracket-intro">
+      <div>
+        <h2>This week</h2>
+        <p class="eyebrow" id="weekRange"></p>
+        <p class="hint">A predicted final score for every game in the next seven days, from the same ratings as the standings. Change the inputs on the Standings tab and these update with them.</p>
+      </div>
+      <div class="champ" id="weekRecord"></div>
+    </section>
+    <section id="weekDays" class="week-days"></section>
+    <section class="panel" id="weekGraded"></section>
+    <section class="panel">
+      <h2>How a score is predicted</h2>
+      <div class="method">
+        <div><h3>Who wins</h3><p>Each team's rating from the standings model, minus any player still out for that particular game, plus 2.5 points for home court. The same rating gap sets the win probability.</p></div>
+        <div><h3>The score</h3><p>The total comes from how many points each team's games have produced this season, pulled toward the league average while samples are small. The predicted margin splits that total into a final score.</p></div>
+        <div><h3>Player stats</h3><p>20% of every team rating now comes from its current roster: the top 10 players by minutes, rated on Box Plus/Minus. Trades and hot or cold players show up right away, in the standings, the bracket and these games.</p></div>
+        <div><h3>Keeping score</h3><p>Every morning the daily update saves that day's predictions before tipoff. Once a game is final it's graded against the real score, so the season record above can't be edited after the fact.</p></div>
+      </div>
+    </section>
+  </div>
+
   <div class="view" id="view-bracket" role="tabpanel" aria-labelledby="tab-bracket" hidden>
     <section class="bracket-intro">
       <div>
@@ -145,5 +168,6 @@
 <script src="js/playoffs.js"></script>
 <script src="js/app.js"></script>
 <script src="js/bracket.js"></script>
+<script src="js/weekly.js"></script>
 </body>
 </html>

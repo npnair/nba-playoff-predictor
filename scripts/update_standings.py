@@ -183,6 +183,8 @@ def main() -> int:
     today = (now - timedelta(days=1)).date() if now.hour < 22 else now.date()
     label = f"Standings through {today:%b} {today.day}, {today.year}"
     py = sys.executable
+    # Save this week's game predictions before tipoff (graded later), then build the web data
+    subprocess.run([py, "-m", "predictor.weekly", "--save", "results/game_predictions.csv"], check=True, cwd=ROOT)
     subprocess.run([py, str(ROOT / "scripts" / "build_web_data.py"), "--as-of", label], check=True, cwd=ROOT)
     subprocess.run(
         [py, "-m", "predictor", "--sims", "10000", "--seed", str(int(today.strftime("%Y%m%d"))),

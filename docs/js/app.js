@@ -26,6 +26,9 @@
   const pct = (v) => (v >= 0.995 ? ">99%" : v <= 0.005 ? (v > 0 ? "<1%" : "0%") : Math.round(v * 100) + "%");
   const signed = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
 
+  const players = (DATA.players || []).map(([team, bref_id, player, pos, mpg, bpm]) => ({ team, bref_id, player, pos, mpg, bpm }));
+  const rosterW = M.rosterShare(players);
+
   let teams = clone(DATA.teams);
   let injuries = clone(DATA.injuries);
   let moves = clone(DATA.moves);
@@ -71,15 +74,19 @@
     const [a, b, c] = M.blendWeights(settings());
     // Overall mix for an average team today, games so far included
     const gp = teams.reduce((s, t) => s + M.gamesPlayed(t), 0) / teams.length, k = evidenceGames();
-    const g = gp / (gp + k), pr = 1 - g, r = (v) => Math.round(v * 100) + "%";
+    // Team results and pre-season views share what's left after the roster's player-stats slice
+    const rest = 1 - rosterW;
+    const g = rest * gp / (gp + k), pr = rest - g, r = (v) => Math.round(v * 100) + "%";
     $("kVal").textContent = gp ? `${r(g)} today (pre-season = ${k} games)` : `pre-season = ${k} games`;
     [["vLast", "mix1", a], ["vLine", "mix2", b], ["vPre", "mix3", c]].forEach(([label, bar, v]) => {
       $(label).textContent = Math.round(v * 100) + "%";
       $(bar).style.width = pr * v * 100 + "%";
     });
     $("mix4").style.width = g * 100 + "%";
+    $("mix5").style.width = rosterW * 100 + "%";
     $("mixkeyGames").style.display = gp ? "" : "none";
-    $("todayMix").textContent = gp ? `Today's mix (about ${Math.round(gp)} games played): ${r(pr * a)} last season · ${r(g)} games so far · ${r(pr * b)} win total${c * pr >= 0.005 ? ` · ${r(pr * c)} preseason games` : ""}.` : "";
+    $("mixkeyRoster").style.display = rosterW ? "" : "none";
+    $("todayMix").textContent = gp ? `Today's mix (about ${Math.round(gp)} games played): ${r(g)} games so far · ${r(rosterW)} current roster's player stats · ${r(pr * a)} last season · ${r(pr * b)} win total${c * pr >= 0.005 ? ` · ${r(pr * c)} preseason games` : ""}.` : "";
   }
 
   // ---------- boards ----------
@@ -98,7 +105,7 @@
       const list = rows.filter((r) => teams[r.index].conference === conf).sort((a, b) => a.avgSeed - b.avgSeed);
       const body = list.map((r, k) => {
         const t = teams[r.index];
-        const lost = M.injuryWinsLost(t, injuries, evidenceGames());
+        const lost = M.injuryWinsLost(t, injuries, evidenceGames(), rosterW);
         const moved = M.moveTotal(moves, t.id);
         const injNames = injuries.filter((j) => j.team === t.id).map((j) => j.player).join("; ") || "No injuries listed";
         const moveNames = moves.filter((m) => m.team === t.id).map((m) => m.move).join("; ") || "No moves listed";
@@ -160,10 +167,10 @@
     btn.disabled = true;
     btn.textContent = "Simulating…";
     requestAnimationFrame(() => setTimeout(() => {
-      results = M.simulate(teams, injuries, moves, settings(), seededRandom(DATA.asOf));
+      results = M.simulate(teams, injuries, moves, settings(), seededRandom(DATA.asOf), players);
       $("simStat").textContent = (+$("simSel").value).toLocaleString();
       render();
-      window.dispatchEvent(new CustomEvent("pl:results", { detail: { teams, injuries, results } }));
+      window.dispatchEvent(new CustomEvent("pl:results", { detail: { teams, injuries, results, players, settings: settings() } }));
       btn.disabled = false;
       btn.textContent = "Simulate season";
       save();

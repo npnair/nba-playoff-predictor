@@ -7,8 +7,8 @@ import csv
 from datetime import date
 from pathlib import Path
 
-from .data_io import CONFERENCES, DATA_DIR, load_all
-from .model import Settings, simulate
+from .data_io import CONFERENCES, DATA_DIR, load_all, load_players
+from .model import Settings, roster_share, simulate
 
 
 def pct(v: float) -> str:
@@ -54,12 +54,14 @@ def main() -> None:
     args = p.parse_args()
 
     teams, injuries, moves = load_all(args.data_dir)
+    players = load_players(args.data_dir)
     settings = Settings(*args.weights, evidence_games=args.evidence, sims=args.sims, seed=args.seed)
-    results = simulate(teams, injuries, moves, settings)
+    results = simulate(teams, injuries, moves, settings, players)
 
     gp = sum(t.games_played for t in teams) / len(teams)
     print(f"Simulated {args.sims:,} seasons. Average games played: {gp:.1f}. "
-          f"Weight on 2026-27 games: {gp / (gp + args.evidence):.0%}.")
+          f"Weight on 2026-27 games: {(1 - roster_share(players)) * gp / (gp + args.evidence):.0%}"
+          f"{f', on current roster player stats: {roster_share(players):.0%}' if players else ''}.")
     for conf in CONFERENCES:
         print_conference(conf, results)
     print("\n  * clinched a top-6 seed   x eliminated from the play-in   Rtg and Moves in points per game")
@@ -89,7 +91,7 @@ def print_bracket(teams, injuries, moves, settings, results) -> None:
     if not players:
         print("\nNo player data yet (data/players.csv); run scripts/update_standings.py first.")
         return
-    rating, _, _ = team_ratings(teams, moves, settings, injuries)
+    rating, _, _ = team_ratings(teams, moves, settings, injuries, players)
     pen = injury_penalties(teams, injuries)
     ratings = {t.id: float(rating[i] - pen[i, t.games_left]) for i, t in enumerate(teams)}
     left = {t.id: t.games_left for t in teams}

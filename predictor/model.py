@@ -8,6 +8,9 @@ Pipeline:
    differential with a little win-loss record mixed in, so closing out games earns some credit.
    Games a player has already missed are added back first, so the blended rating describes a
    healthy roster and an injury is never counted twice.
+   Then 20% of the rating comes from the current roster: each team's top-10 rotation, weighted by
+   minutes, rated on Box Plus/Minus (this season blended with last). It picks up trades and
+   signings as they happen and reads player form directly, not just team results.
 3. Simulate every remaining game, lowering a team's rating while injured players are out.
 4. Seed each conference by wins, then play the 7-10 play-in tournament.
 """
@@ -28,6 +31,8 @@ LAST_SEASON_KEEP = 0.7          # regress last season's net rating 30% toward av
 PRESEASON_GHOST_GAMES = 3       # add a 3-3 ghost record: exhibition games are noisy
 RATING_SD = 3.0                 # uncertainty in a preseason rating, points
 RECORD_SHARE = 0.2              # share of the in-season result taken from W-L record, rest from margin
+ROSTER_SHARE = 0.2              # share of each team's rating taken from its current roster's player stats
+ROSTER_SIZE = 10                # players in the rotation that the roster rating counts
 
 
 @dataclass
@@ -100,8 +105,33 @@ def observed_margin(team: Team) -> float:
     return (1 - RECORD_SHARE) * team.point_diff + RECORD_SHARE * record_margin(team)
 
 
-def team_ratings(teams: list[Team], moves: list[Move], s: Settings,
-                 injuries: list[Injury] = ()) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def roster_ratings(teams: list[Team], players: list[dict] | None) -> np.ndarray | None:
+    """Healthy-roster strength in points of margin vs average, from player Box Plus/Minus.
+
+    Each team's top ROSTER_SIZE players by minutes, weighted so the minutes add up to five players
+    on the floor. Injured players are included: injuries are applied game by game in the
+    simulation. None when there is no player data.
+    """
+    if not players:
+        return None
+    out = []
+    for t in teams:
+        rot = sorted((p for p in players if p["team"] == t.id), key=lambda p: (-p["mpg"], p["player"]))[:ROSTER_SIZE]
+        mins = sum(p["mpg"] for p in rot)
+        out.append(sum(5 * p["mpg"] / mins * p["bpm"] for p in rot) if len(rot) >= 5 and mins > 0 else np.nan)
+    out = np.array(out)
+    if np.isnan(out).all():
+        return None
+    out = np.where(np.isnan(out), np.nanmean(out), out)
+    return out - out.mean()
+
+
+def roster_share(players: list[dict] | None) -> float:
+    return ROSTER_SHARE if players else 0.0
+
+
+def team_ratings(teams: list[Team], moves: list[Move], s: Settings, injuries: list[Injury] = (),
+                 players: list[dict] | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Return (rating, rating_sd, preseason_prior) arrays, one entry per team. Ratings are healthy."""
     a, b, c = blend_weights(s)
     comp = components(teams, moves)
@@ -112,6 +142,9 @@ def team_ratings(teams: list[Team], moves: list[Move], s: Settings,
     gp = np.array([t.games_played for t in teams], dtype=float)
     observed = np.array([observed_margin(t) for t in teams])
     rating = (prior * k + observed * gp + healthy_bonus(teams, injuries)) / (k + gp)
+    roster = roster_ratings(teams, players)
+    if roster is not None:
+        rating = (1 - ROSTER_SHARE) * rating + ROSTER_SHARE * roster
     sd = RATING_SD * np.sqrt(k / (k + gp))
     return rating, sd, prior
 
@@ -132,13 +165,16 @@ def win_prob(a, b, home):
     return 1.0 / (1.0 + np.exp(-((a - b) + edge) / LOGISTIC_SCALE))
 
 
-def injury_wins_lost(team: Team, injuries: list[Injury], evidence_games: float = Settings.evidence_games) -> float:
+def injury_wins_lost(team: Team, injuries: list[Injury], evidence_games: float = Settings.evidence_games,
+                     roster: float = 0.0) -> float:
     """Net wins the projection loses to injuries: games still to miss, minus the rating added back
-    for games already missed (that boost applies to every remaining game)."""
+    for games already missed (that boost applies to every remaining game). `roster` is the share of
+    the rating that comes from player stats, which the add-back doesn't touch."""
     per_point = WINS_PER_POINT / GAMES
     left, gp = team.games_left, team.games_played
     return sum(
-        j.impact * per_point * (min(left, j.games_out) - left * min(j.games_missed, gp) / (evidence_games + gp))
+        j.impact * per_point
+        * (min(left, j.games_out) - (1 - roster) * left * min(j.games_missed, gp) / (evidence_games + gp))
         for j in injuries if j.team == team.id
     )
 
@@ -156,11 +192,12 @@ def clinch_status(team: Team, teams: list[Team]) -> str:
     return ""
 
 
-def simulate(teams: list[Team], injuries: list[Injury], moves: list[Move], s: Settings | None = None) -> list[dict]:
+def simulate(teams: list[Team], injuries: list[Injury], moves: list[Move], s: Settings | None = None,
+             players: list[dict] | None = None) -> list[dict]:
     s = s or Settings()
     rng = np.random.default_rng(s.seed)
     n, N = len(teams), s.sims
-    rating, sd, prior = team_ratings(teams, moves, s, injuries)
+    rating, sd, prior = team_ratings(teams, moves, s, injuries, players)
     pen = injury_penalties(teams, injuries)
     left = np.array([t.games_left for t in teams])
 
@@ -215,7 +252,7 @@ def simulate(teams: list[Team], injuries: list[Injury], moves: list[Move], s: Se
             "record": f"{t.w}-{t.l}",
             "rating": round(float(rating[i]), 2),
             "moves": round(float(moved[i]), 2),
-            "injury_wins_lost": round(injury_wins_lost(t, injuries, s.evidence_games), 2),
+            "injury_wins_lost": round(injury_wins_lost(t, injuries, s.evidence_games, roster_share(players)), 2),
             "proj_wins": round(float(wins[:, i].mean()), 1),
             "top6": float(top6[i] / N),
             "play_in": float(play_in[i] / N),
