@@ -429,84 +429,84 @@ window.PL_DATA = {
    "player": "Henri Veesaar (ACL, season)",
    "impact": 0.3,
    "games_out": 82,
-   "games_missed": 13
+   "games_missed": 14
   },
   {
    "team": "ATL",
    "player": "Mouhamed Gueye (foot, re-eval ~Dec 12)",
    "impact": 0.6,
-   "games_out": 8,
-   "games_missed": 13
+   "games_out": 7,
+   "games_missed": 14
   },
   {
    "team": "ATL",
    "player": "Asa Newell (toe, ~Nov 20)",
    "impact": 0.3,
-   "games_out": 2,
-   "games_missed": 8
+   "games_out": 1,
+   "games_missed": 9
   },
   {
    "team": "CHA",
    "player": "Kon Knueppel (hamstring, re-eval ~Dec 12)",
    "impact": 2.5,
-   "games_out": 8,
-   "games_missed": 11
+   "games_out": 7,
+   "games_missed": 12
   },
   {
    "team": "CHA",
    "player": "Dennis Schroder (hamstring, re-eval ~Nov 25)",
    "impact": 0.8,
-   "games_out": 4,
-   "games_missed": 3
-  },
-  {
-   "team": "CHI",
-   "player": "Caleb Wilson (hand, 4–6 wks)",
-   "impact": 0.2,
-   "games_out": 10,
-   "games_missed": 1
-  },
-  {
-   "team": "CLE",
-   "player": "Evan Mobley (toe, out Nov 14)",
-   "impact": 2.2,
-   "games_out": 1,
-   "games_missed": 1
-  },
-  {
-   "team": "CLE",
-   "player": "Sam Merrill (elbow, ~Nov 16)",
-   "impact": 0.5,
-   "games_out": 1,
+   "games_out": 3,
    "games_missed": 4
   },
   {
-   "team": "DAL",
-   "player": "Dereck Lively II (foot, ~Nov 18)",
-   "impact": 1.5,
-   "games_out": 2,
-   "games_missed": 12
+   "team": "CHI",
+   "player": "Tobe Awaka (back, ~Nov 18)",
+   "impact": 0.2,
+   "games_out": 1,
+   "games_missed": 8
+  },
+  {
+   "team": "CHI",
+   "player": "Caleb Wilson (hand, 4–6 wks, ~Dec 13)",
+   "impact": 0.2,
+   "games_out": 9,
+   "games_missed": 2
+  },
+  {
+   "team": "CLE",
+   "player": "Evan Mobley (toe, ~Nov 18)",
+   "impact": 2.2,
+   "games_out": 1,
+   "games_missed": 2
+  },
+  {
+   "team": "CLE",
+   "player": "Sam Merrill (elbow, ~Nov 18)",
+   "impact": 0.5,
+   "games_out": 1,
+   "games_missed": 5
+  },
+  {
+   "team": "CLE",
+   "player": "Nae'Qwan Tomlin (back stress reaction, ~Nov 18)",
+   "impact": 0.2,
+   "games_out": 1,
+   "games_missed": 14
   },
   {
    "team": "DEN",
    "player": "Julian Strawther (knee, ~Nov 29)",
    "impact": 0.5,
-   "games_out": 7,
-   "games_missed": 10
-  },
-  {
-   "team": "DET",
-   "player": "Isaiah Joe (hip, ~Nov 17)",
-   "impact": 0.8,
-   "games_out": 1,
-   "games_missed": 8
+   "games_out": 6,
+   "games_missed": 11
   },
   {
    "team": "DET",
    "player": "Jalen Duren (hamstring, re-eval ~Nov 24)",
    "impact": 2.0,
-   "games_out": 5,
-   "games_missed": 9
+   "games_out": 4,
+   "games_missed": 10
   },
   {
    "team": "GSW",
@@ -547,162 +547,169 @@ window.PL_DATA = {
    "team": "IND",
    "player": "Tyrese Haliburton (hamstring, ~Nov 22)",
    "impact": 3.0,
-   "games_out": 3,
-   "games_missed": 9
+   "games_out": 2,
+   "games_missed": 10
   },
   {
    "team": "IND",
    "player": "Johnny Furphy (knee, ~Jan)",
    "impact": 0.3,
-   "games_out": 25,
-   "games_missed": 13
+   "games_out": 24,
+   "games_missed": 14
   },
   {
    "team": "IND",
    "player": "Ben Sheppard (meniscus surgery, ~Jan)",
    "impact": 0.3,
-   "games_out": 25,
-   "games_missed": 12
+   "games_out": 24,
+   "games_missed": 13
   },
   {
    "team": "LAC",
    "player": "Brandon Ingram (Achilles, ~Nov 19)",
    "impact": 1.5,
-   "games_out": 2,
-   "games_missed": 11
+   "games_out": 1,
+   "games_missed": 12
   },
   {
    "team": "LAC",
    "player": "Bradley Beal (knee, ~Nov 29)",
    "impact": 1.0,
-   "games_out": 7,
-   "games_missed": 11
+   "games_out": 6,
+   "games_missed": 12
   },
   {
    "team": "LAC",
    "player": "Jordan Miller (rotator cuff, ~Mar)",
    "impact": 0.3,
-   "games_out": 53,
-   "games_missed": 11
+   "games_out": 52,
+   "games_missed": 12
   },
   {
    "team": "MEM",
-   "player": "Zach Edey (ankle, out Nov 14)",
-   "impact": 0.3,
+   "player": "GG Jackson (foot, ~Nov 18)",
+   "impact": 0.2,
+   "games_out": 1,
+   "games_missed": 1
+  },
+  {
+   "team": "MEM",
+   "player": "Ty Jerome (hip, ~Nov 18)",
+   "impact": 2.3,
    "games_out": 1,
    "games_missed": 2
   },
   {
    "team": "MEM",
-   "player": "Quinten Post (concussion, out Nov 14)",
+   "player": "Scotty Pippen Jr. (back, ~Nov 21)",
+   "impact": 0.5,
+   "games_out": 3,
+   "games_missed": 8
+  },
+  {
+   "team": "MIL",
+   "player": "Ousmane Dieng (finger fracture, ~Dec 14)",
    "impact": 0.2,
-   "games_out": 1,
+   "games_out": 10,
    "games_missed": 4
   },
   {
-   "team": "MEM",
-   "player": "Scotty Pippen Jr. (back, ~Nov 21)",
-   "impact": 0.5,
-   "games_out": 4,
-   "games_missed": 7
-  },
-  {
-   "team": "MIA",
-   "player": "Klay Thompson (ankle, out Nov 14)",
-   "impact": 0.4,
-   "games_out": 1,
-   "games_missed": 1
-  },
-  {
-   "team": "MIA",
-   "player": "Pelle Larsson (illness, out Nov 14)",
+   "team": "MIN",
+   "player": "Jaylen Clark (hamstring, ~Nov 29)",
    "impact": 0.2,
-   "games_out": 1,
+   "games_out": 7,
    "games_missed": 1
   },
   {
    "team": "MIN",
    "player": "Anthony Edwards (knee scope, ~Dec 21)",
    "impact": 3.5,
-   "games_out": 15,
-   "games_missed": 8
+   "games_out": 14,
+   "games_missed": 9
   },
   {
    "team": "MIN",
    "player": "Donte DiVincenzo (Achilles, ~Apr)",
    "impact": 1.0,
-   "games_out": 67,
-   "games_missed": 12
+   "games_out": 66,
+   "games_missed": 13
   },
   {
    "team": "NOP",
-   "player": "Dejounte Murray (ankle, ~Nov 20)",
-   "impact": 0.5,
-   "games_out": 3,
-   "games_missed": 4
-  },
-  {
-   "team": "NOP",
-   "player": "Trey Murphy III (knee, out Nov 14)",
-   "impact": 1.5,
+   "player": "Trendon Watford (ankle, ~Nov 18)",
+   "impact": 0.2,
    "games_out": 1,
-   "games_missed": 4
+   "games_missed": 8
   },
   {
    "team": "NOP",
-   "player": "Yves Missi (knee, out Nov 14)",
-   "impact": 0.5,
-   "games_out": 1,
-   "games_missed": 11
-  },
-  {
-   "team": "NOP",
-   "player": "Trendon Watford (ankle, out Nov 14)",
+   "player": "Bryce McGowens (elbow, ~Nov 18)",
    "impact": 0.2,
    "games_out": 1,
    "games_missed": 7
   },
   {
    "team": "NOP",
-   "player": "Bryce McGowens (elbow, out Nov 14)",
+   "player": "Bennedict Mathurin (plantar fasciitis, ~Nov 18)",
    "impact": 0.2,
    "games_out": 1,
-   "games_missed": 6
+   "games_missed": 2
   },
   {
-   "team": "OKC",
-   "player": "Chet Holmgren (patellar tendon, ~Jan)",
-   "impact": 2.5,
-   "games_out": 25,
-   "games_missed": 10
+   "team": "NOP",
+   "player": "Trey Murphy III (knee, ~Nov 18)",
+   "impact": 1.5,
+   "games_out": 1,
+   "games_missed": 5
   },
   {
-   "team": "OKC",
-   "player": "Jalen Williams (fibula fracture, ~Mar)",
-   "impact": 2.0,
-   "games_out": 53,
-   "games_missed": 10
-  },
-  {
-   "team": "OKC",
-   "player": "Cason Wallace (shoulder surgery, ~Mar)",
-   "impact": 1.0,
-   "games_out": 53,
-   "games_missed": 10
+   "team": "NOP",
+   "player": "Dejounte Murray (ankle, ~Nov 20)",
+   "impact": 0.5,
+   "games_out": 2,
+   "games_missed": 5
   },
   {
    "team": "OKC",
    "player": "Thomas Sorber (knee, ~Nov 20)",
    "impact": 0.3,
-   "games_out": 2,
-   "games_missed": 13
+   "games_out": 1,
+   "games_missed": 14
   },
   {
    "team": "OKC",
-   "player": "Jaylin Williams (back, indefinite)",
-   "impact": 0.4,
+   "player": "Cason Wallace (shoulder surgery, ~Mar)",
+   "impact": 1.0,
+   "games_out": 52,
+   "games_missed": 11
+  },
+  {
+   "team": "OKC",
+   "player": "Chet Holmgren (patellar tendon, ~Jan)",
+   "impact": 2.5,
+   "games_out": 24,
+   "games_missed": 11
+  },
+  {
+   "team": "OKC",
+   "player": "Jalen Williams (fibula fracture, ~Mar)",
+   "impact": 2.0,
+   "games_out": 52,
+   "games_missed": 11
+  },
+  {
+   "team": "ORL",
+   "player": "Jonathan Isaac (knee, ~Nov 18)",
+   "impact": 0.2,
+   "games_out": 1,
+   "games_missed": 12
+  },
+  {
+   "team": "ORL",
+   "player": "Noah Penda (hamstring, ~Nov 22)",
+   "impact": 0.3,
    "games_out": 3,
-   "games_missed": 6
+   "games_missed": 12
   },
   {
    "team": "ORL",
@@ -713,45 +720,45 @@ window.PL_DATA = {
   },
   {
    "team": "ORL",
-   "player": "Noah Penda (hamstring, ~Nov 18)",
-   "impact": 0.3,
+   "player": "Izaiyah Nelson (ankle surgery, ~Nov 18)",
+   "impact": 0.2,
    "games_out": 1,
    "games_missed": 12
   },
   {
    "team": "PHI",
+   "player": "LeBron James (back, ~Nov 18)",
+   "impact": 1.9,
+   "games_out": 1,
+   "games_missed": 3
+  },
+  {
+   "team": "PHI",
    "player": "Dominick Barlow (back, ~Nov 18)",
    "impact": 0.3,
-   "games_out": 2,
-   "games_missed": 13
+   "games_out": 1,
+   "games_missed": 14
   },
   {
    "team": "PHI",
    "player": "Adem Bona (back, re-eval ~Nov 18)",
    "impact": 0.5,
-   "games_out": 2,
-   "games_missed": 4
+   "games_out": 1,
+   "games_missed": 5
   },
   {
    "team": "PHI",
    "player": "Ariel Hukporti (Achilles, season)",
    "impact": 0.2,
    "games_out": 82,
-   "games_missed": 13
+   "games_missed": 14
   },
   {
    "team": "PHX",
-   "player": "Mark Williams (shoulder, ~Feb)",
+   "player": "Mark Williams (shoulder, ~Feb 3)",
    "impact": 1.5,
-   "games_out": 36,
-   "games_missed": 11
-  },
-  {
-   "team": "POR",
-   "player": "Ja Morant (hamstring, ~Dec 1)",
-   "impact": 1.5,
-   "games_out": 10,
-   "games_missed": 8
+   "games_out": 35,
+   "games_missed": 12
   },
   {
    "team": "POR",
@@ -759,6 +766,13 @@ window.PL_DATA = {
    "impact": 0.5,
    "games_out": 24,
    "games_missed": 5
+  },
+  {
+   "team": "POR",
+   "player": "Ja Morant (hamstring, ~Dec 1)",
+   "impact": 1.5,
+   "games_out": 10,
+   "games_missed": 8
   },
   {
    "team": "POR",
@@ -772,77 +786,84 @@ window.PL_DATA = {
    "player": "Ben Simmons (Achilles, season)",
    "impact": 0.3,
    "games_out": 82,
-   "games_missed": 12
+   "games_missed": 13
   },
   {
    "team": "SAS",
    "player": "Tobias Harris (calf, ~Nov 19)",
    "impact": 0.8,
-   "games_out": 2,
-   "games_missed": 13
+   "games_out": 1,
+   "games_missed": 14
   },
   {
    "team": "SAS",
    "player": "Jayden Quaintance (knee, ~Dec 3)",
    "impact": 0.3,
-   "games_out": 9,
+   "games_out": 8,
+   "games_missed": 14
+  },
+  {
+   "team": "TOR",
+   "player": "Nate Bittle (foot, ~Nov 23)",
+   "impact": 0.2,
+   "games_out": 3,
    "games_missed": 13
   },
   {
    "team": "TOR",
    "player": "Kawhi Leonard (knee, ~Nov 23)",
    "impact": 3.0,
-   "games_out": 4,
-   "games_missed": 10
+   "games_out": 3,
+   "games_missed": 11
   },
   {
    "team": "UTA",
    "player": "Lauri Markkanen (hand fracture, ~Jan 4)",
    "impact": 1.7,
-   "games_out": 21,
-   "games_missed": 5
+   "games_out": 20,
+   "games_missed": 6
   },
   {
    "team": "UTA",
    "player": "Jusuf Nurkic (foot, re-eval ~Nov 20)",
    "impact": 1.0,
-   "games_out": 3,
-   "games_missed": 13
+   "games_out": 2,
+   "games_missed": 14
   },
   {
    "team": "UTA",
    "player": "Jaren Jackson Jr. (MCL, ~Dec 14)",
    "impact": 1.5,
-   "games_out": 11,
-   "games_missed": 9
+   "games_out": 10,
+   "games_missed": 10
   },
   {
    "team": "WAS",
-   "player": "Tristan Vukcevic (hip, ~Nov 16)",
+   "player": "Tristan Vukcevic (hip, ~Nov 24)",
    "impact": 0.3,
-   "games_out": 1,
-   "games_missed": 13
+   "games_out": 4,
+   "games_missed": 14
   },
   {
    "team": "WAS",
    "player": "Reece Beekman (AC joint, ~Dec 3)",
    "impact": 0.3,
-   "games_out": 8,
-   "games_missed": 12
+   "games_out": 7,
+   "games_missed": 13
   },
   {
    "team": "WAS",
    "player": "Justin Champagnie (foot, ~Feb 25)",
    "impact": 0.5,
-   "games_out": 44,
-   "games_missed": 9
+   "games_out": 43,
+   "games_missed": 10
   },
   {
    "team": "WAS",
    "player": "Jamir Watkins (ACL, ~Apr)",
    "impact": 0.3,
-   "games_out": 67,
-   "games_missed": 13
+   "games_out": 66,
+   "games_missed": 14
   }
  ],
  "moves": [
@@ -2449,7 +2470,7 @@ window.PL_DATA = {
    "PHI",
    110,
    116,
-   0.271
+   0.32
   ],
   [
    "2026-11-16",
@@ -2457,7 +2478,7 @@ window.PL_DATA = {
    "ORL",
    119,
    104,
-   0.903
+   0.906
   ],
   [
    "2026-11-16",
@@ -2465,7 +2486,7 @@ window.PL_DATA = {
    "CHI",
    121,
    112,
-   0.791
+   0.794
   ],
   [
    "2026-11-16",
@@ -2473,15 +2494,15 @@ window.PL_DATA = {
    "PHX",
    118,
    110,
-   0.755
+   0.754
   ],
   [
    "2026-11-16",
    "MIA",
    "HOU",
    113,
-   118,
-   0.324
+   117,
+   0.342
   ],
   [
    "2026-11-16",
@@ -2489,7 +2510,7 @@ window.PL_DATA = {
    "POR",
    116,
    112,
-   0.626
+   0.625
   ],
   [
    "2026-11-16",
@@ -2497,15 +2518,15 @@ window.PL_DATA = {
    "GSW",
    114,
    118,
-   0.381
+   0.387
   ],
   [
    "2026-11-16",
    "WAS",
    "MEM",
-   111,
+   112,
    118,
-   0.247
+   0.301
   ],
   [
    "2026-11-17",
@@ -2513,7 +2534,7 @@ window.PL_DATA = {
    "UTA",
    118,
    110,
-   0.757
+   0.756
   ],
   [
    "2026-11-17",
@@ -2521,7 +2542,7 @@ window.PL_DATA = {
    "CHA",
    121,
    105,
-   0.91
+   0.909
   ],
   [
    "2026-11-17",
@@ -2529,23 +2550,23 @@ window.PL_DATA = {
    "POR",
    116,
    112,
-   0.626
+   0.625
   ],
   [
    "2026-11-17",
    "SAS",
    "DET",
    118,
-   108,
-   0.793
+   109,
+   0.779
   ],
   [
    "2026-11-17",
    "TOR",
    "NYK",
-   110,
+   111,
    113,
-   0.415
+   0.416
   ],
   [
    "2026-11-18",
@@ -2553,7 +2574,7 @@ window.PL_DATA = {
    "CHI",
    117,
    114,
-   0.626
+   0.624
   ],
   [
    "2026-11-18",
@@ -2561,23 +2582,23 @@ window.PL_DATA = {
    "MEM",
    116,
    115,
-   0.539
+   0.541
   ],
   [
    "2026-11-18",
    "DAL",
    "GSW",
    116,
-   112,
-   0.639
+   111,
+   0.665
   ],
   [
    "2026-11-18",
    "DEN",
    "BOS",
    110,
-   115,
-   0.353
+   114,
+   0.354
   ],
   [
    "2026-11-18",
@@ -2585,7 +2606,7 @@ window.PL_DATA = {
    "HOU",
    109,
    118,
-   0.197
+   0.2
   ],
   [
    "2026-11-18",
@@ -2593,15 +2614,15 @@ window.PL_DATA = {
    "UTA",
    124,
    105,
-   0.939
+   0.937
   ],
   [
    "2026-11-18",
    "MIA",
    "MIL",
-   121,
+   122,
    109,
-   0.862
+   0.864
   ],
   [
    "2026-11-18",
@@ -2609,7 +2630,7 @@ window.PL_DATA = {
    "DET",
    111,
    120,
-   0.223
+   0.225
   ],
   [
    "2026-11-18",
@@ -2617,15 +2638,15 @@ window.PL_DATA = {
    "ATL",
    116,
    111,
-   0.668
+   0.683
   ],
   [
    "2026-11-18",
    "ORL",
    "PHI",
    110,
-   114,
-   0.371
+   115,
+   0.333
   ],
   [
    "2026-11-18",
@@ -2633,7 +2654,7 @@ window.PL_DATA = {
    "PHX",
    111,
    117,
-   0.299
+   0.297
   ],
   [
    "2026-11-18",
@@ -2641,7 +2662,7 @@ window.PL_DATA = {
    "WAS",
    118,
    109,
-   0.785
+   0.792
   ],
   [
    "2026-11-19",
@@ -2649,7 +2670,7 @@ window.PL_DATA = {
    "GSW",
    119,
    110,
-   0.792
+   0.796
   ],
   [
    "2026-11-19",
@@ -2657,7 +2678,7 @@ window.PL_DATA = {
    "POR",
    109,
    119,
-   0.187
+   0.183
   ],
   [
    "2026-11-19",
@@ -2665,23 +2686,23 @@ window.PL_DATA = {
    "NYK",
    113,
    110,
-   0.579
+   0.578
   ],
   [
    "2026-11-19",
    "SAS",
    "LAC",
-   123,
+   122,
    105,
-   0.929
+   0.921
   ],
   [
    "2026-11-20",
    "ATL",
    "CHA",
-   117,
+   118,
    107,
-   0.824
+   0.828
   ],
   [
    "2026-11-20",
@@ -2689,15 +2710,15 @@ window.PL_DATA = {
    "ORL",
    112,
    113,
-   0.475
+   0.478
   ],
   [
    "2026-11-20",
    "CHI",
    "WAS",
    117,
-   115,
-   0.574
+   114,
+   0.585
   ],
   [
    "2026-11-20",
@@ -2705,7 +2726,7 @@ window.PL_DATA = {
    "IND",
    119,
    110,
-   0.79
+   0.792
   ],
   [
    "2026-11-20",
@@ -2713,7 +2734,7 @@ window.PL_DATA = {
    "HOU",
    113,
    115,
-   0.425
+   0.426
   ],
   [
    "2026-11-20",
@@ -2721,7 +2742,7 @@ window.PL_DATA = {
    "TOR",
    117,
    110,
-   0.74
+   0.734
   ],
   [
    "2026-11-20",
@@ -2737,31 +2758,31 @@ window.PL_DATA = {
    "NOP",
    121,
    108,
-   0.856
+   0.863
   ],
   [
    "2026-11-20",
    "UTA",
    "PHX",
    111,
-   117,
-   0.309
+   116,
+   0.343
   ],
   [
    "2026-11-21",
    "DAL",
    "LAC",
    116,
-   112,
-   0.644
+   111,
+   0.666
   ],
   [
    "2026-11-21",
    "MIN",
    "MEM",
-   116,
-   112,
-   0.613
+   115,
+   113,
+   0.59
   ],
   [
    "2026-11-21",
@@ -2777,7 +2798,7 @@ window.PL_DATA = {
    "MIL",
    121,
    105,
-   0.909
+   0.914
   ],
   [
    "2026-11-21",
@@ -2793,7 +2814,7 @@ window.PL_DATA = {
    "NOP",
    125,
    105,
-   0.947
+   0.948
   ],
   [
    "2026-11-22",
@@ -2801,7 +2822,7 @@ window.PL_DATA = {
    "DET",
    114,
    115,
-   0.47
+   0.478
   ],
   [
    "2026-11-22",
@@ -2809,7 +2830,7 @@ window.PL_DATA = {
    "DEN",
    112,
    119,
-   0.243
+   0.244
   ],
   [
    "2026-11-22",
@@ -2825,23 +2846,23 @@ window.PL_DATA = {
    "OKC",
    114,
    115,
-   0.489
+   0.47
   ],
   [
    "2026-11-22",
    "NYK",
    "IND",
-   118,
-   106,
-   0.841
+   116,
+   107,
+   0.772
   ],
   [
    "2026-11-22",
    "UTA",
    "DAL",
    110,
-   117,
-   0.28
+   116,
+   0.305
   ],
   [
    "2026-11-22",
@@ -2849,7 +2870,7 @@ window.PL_DATA = {
    "ORL",
    111,
    115,
-   0.364
+   0.349
   ]
  ],
  "players": [
