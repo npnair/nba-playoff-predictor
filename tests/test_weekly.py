@@ -44,3 +44,14 @@ def test_saved_predictions_freeze_and_grade(tmp_path):
     played = GAMES[:2] + [g("2026-11-02", "AAA", "CCC", 115, 108)] + GAMES[3:]
     graded = grade(rows, played)
     assert len(graded) == 1 and graded[0]["correct"] is True
+
+
+def test_espn_scoreboard_finals_only():
+    from predictor.standings_source import parse_scoreboard
+    def ev(home, away, hs, as_, done):
+        return {"competitions": [{"status": {"type": {"completed": done}}, "competitors": [
+            {"homeAway": "home", "team": {"abbreviation": home}, "score": str(hs)},
+            {"homeAway": "away", "team": {"abbreviation": away}, "score": str(as_)}]}]}
+    payload = {"events": [ev("UTAH", "SA", 101, 118, True), ev("PHX", "LAL", 60, 58, False)]}
+    got = parse_scoreboard(payload, "2026-11-15", {"UTA", "SAS", "PHX", "LAL"})
+    assert got == [{"date": "2026-11-15", "home": "UTA", "away": "SAS", "home_pts": 101, "away_pts": 118}]
