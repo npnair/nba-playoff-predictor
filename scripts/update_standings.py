@@ -23,8 +23,8 @@ sys.path.insert(0, str(ROOT))
 
 from predictor.data_io import DATA_DIR, load_teams  # noqa: E402
 from predictor.standings_source import (  # noqa: E402
-    SEASON, SeasonNotAvailable, _entries, check_progress, fetch_json, parse_standings, reported_season,
-    reported_season_type,
+    SEASON, SeasonNotAvailable, _entries, check_progress, fetch_json, fetch_scoreboard, parse_scoreboard,
+    parse_standings, reported_season, reported_season_type,
 )
 
 STANDINGS = DATA_DIR / "standings.csv"
@@ -107,6 +107,34 @@ def refresh_playoff_inputs(season: int) -> bool:
     return any((p.read_bytes() if p.exists() else b"") != before[p] for p in before)
 
 
+def fill_recent_scores(known: set[str], days: int = 3) -> bool:
+    """Basketball-Reference can take hours to post last night's scores. Fill any missing final scores
+    from the last few days straight from ESPN's scoreboard, so results (and the This Week grading)
+    show up as soon as the games end. Returns True if any score was added."""
+    rows = _read(GAMES_CSV)
+    if not rows:
+        return False
+    today = datetime.now(ZoneInfo("America/Los_Angeles")).date()
+    want = {(today - timedelta(days=i)).isoformat() for i in range(days)}
+    missing = {r["date"] for r in rows if r["date"] in want and not r["home_pts"]}
+    added = 0
+    for day in sorted(missing):
+        try:
+            finals = {(g["home"], g["away"]): g for g in parse_scoreboard(fetch_scoreboard(day), day, known)}
+        except Exception as e:  # noqa: BLE001
+            report(f"ESPN scoreboard for {day} failed, waiting on Basketball-Reference: {e}")
+            continue
+        for r in rows:
+            g = finals.get((r["home"], r["away"]))
+            if r["date"] == day and not r["home_pts"] and g:
+                r["home_pts"], r["away_pts"] = g["home_pts"], g["away_pts"]
+                added += 1
+    if added:
+        _write(GAMES_CSV, GAME_FIELDS, rows)
+        report(f"Filled {added} final scores from ESPN's scoreboard", error=False)
+    return added > 0
+
+
 def refresh_playoff_history(season: int, pause: float = 3.5) -> None:
     """Regular season and playoff BPM for the last few postseasons, turned into each player's
     playoff adjustment (predictor/playoff_history.py). About 10 requests."""
@@ -166,6 +194,8 @@ def main() -> int:
 
     new = {r.id: (r.w, r.l, r.point_diff) for r in rows}
     inputs_changed = False if args.skip_playoff_inputs or args.file else refresh_playoff_inputs(args.season)
+    if not args.file:
+        inputs_changed = fill_recent_scores(known) or inputs_changed
     if new == old and not inputs_changed and not args.force:
         print("No new games since the last update.")
         return 0

@@ -35,8 +35,11 @@ class StandingRow:
     point_diff: float  # average point differential per game
 
 
-def fetch_json(season: int = SEASON, retries: int = 3, timeout: float = 20) -> dict:
-    url = ESPN_URL.format(season=season)
+SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={day}"
+
+
+def fetch_json(season: int = SEASON, retries: int = 3, timeout: float = 20, url: str | None = None) -> dict:
+    url = url or ESPN_URL.format(season=season)
     request = urllib.request.Request(url, headers={"User-Agent": "nba-playoff-predictor (github.com/npnair)"})
     last_error: Exception | None = None
     for attempt in range(retries):
@@ -47,6 +50,34 @@ def fetch_json(season: int = SEASON, retries: int = 3, timeout: float = 20) -> d
             last_error = e
             time.sleep(2 * (attempt + 1))
     raise RuntimeError(f"Could not fetch standings from {url}: {last_error}")
+
+
+def fetch_scoreboard(day: str) -> dict:
+    """ESPN's scoreboard for one date (YYYY-MM-DD, US Eastern game dates like Basketball-Reference)."""
+    return fetch_json(url=SCOREBOARD_URL.format(day=day.replace("-", "")))
+
+
+def parse_scoreboard(payload: dict, day: str, known_ids: set[str]) -> list[dict]:
+    """Final scores from an ESPN scoreboard: [{date, home, away, home_pts, away_pts}], finished games only."""
+    out = []
+    for event in payload.get("events") or []:
+        comp = (event.get("competitions") or [{}])[0]
+        status = (comp.get("status") or event.get("status") or {}).get("type") or {}
+        if not status.get("completed"):
+            continue
+        side = {}
+        for c in comp.get("competitors") or []:
+            raw = str((c.get("team") or {}).get("abbreviation", "")).upper()
+            tid = ESPN_ALIASES.get(raw, raw)
+            try:
+                side[c.get("homeAway")] = (tid, int(float(c.get("score"))))
+            except (TypeError, ValueError):
+                break
+        if set(side) != {"home", "away"} or not {side["home"][0], side["away"][0]} <= known_ids:
+            continue
+        out.append({"date": day, "home": side["home"][0], "away": side["away"][0],
+                    "home_pts": side["home"][1], "away_pts": side["away"][1]})
+    return out
 
 
 def _stat(stats: list[dict], *keys: str) -> float | None:
