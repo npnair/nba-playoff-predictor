@@ -213,7 +213,10 @@ def main() -> int:
     today = (now - timedelta(days=1)).date() if now.hour < 22 else now.date()
     label = f"Standings through {today:%b} {today.day}, {today.year}"
     py = sys.executable
-    # Save this week's game predictions before tipoff (graded later), then build the web data
+    # Retune the model's settings on every game played so far, then save this week's game
+    # predictions before tipoff (graded later), then build the web data. Each step is a new
+    # process, so it picks up the freshly learned settings.
+    subprocess.run([py, "-m", "predictor.learn", "--write"], check=True, cwd=ROOT)
     subprocess.run([py, "-m", "predictor.weekly", "--save", "results/game_predictions.csv"], check=True, cwd=ROOT)
     subprocess.run([py, str(ROOT / "scripts" / "build_web_data.py"), "--as-of", label], check=True, cwd=ROOT)
     subprocess.run(

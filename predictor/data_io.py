@@ -128,6 +128,15 @@ def load_all(data_dir: Path = DATA_DIR) -> tuple[list[Team], list[Injury], list[
     return teams, injuries, moves
 
 
+def load_learned(data_dir: Path = DATA_DIR) -> dict:
+    """The model's self-tuned settings (written each day by predictor/learn.py). Empty if missing."""
+    import json
+    path = data_dir / "learned.json"
+    if not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 # ------------------------------------------------------------------ playoff bracket inputs
 def load_games(data_dir: Path = DATA_DIR) -> list[dict]:
     """Every 2026-27 game: date, home, away, and scores (blank until played)."""

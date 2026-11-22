@@ -2,8 +2,10 @@
 (function (global) {
   "use strict";
 
-  const HOME_COURT = 2.5;
-  const LOGISTIC_SCALE = 7.0;
+  // Same tuned values as model.js (predictor/learn.py), defaults when there is no learned data
+  const LEARNED = (global.PL_DATA && global.PL_DATA.learned && global.PL_DATA.learned.settings) || {};
+  const HOME_COURT = LEARNED.home_court != null ? +LEARNED.home_court : 2.5;
+  const LOGISTIC_SCALE = LEARNED.logistic_scale != null ? +LEARNED.logistic_scale : 7.0;
   const WEIGHTS = { rating: 0.5, lineup: 0.3, h2h: 0.2 };
   const H2H_PRIOR_GAMES = 4;
   const STARTER_MINUTES = 36;

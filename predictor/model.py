@@ -11,8 +11,14 @@ Pipeline:
    Then 20% of the rating comes from the current roster: each team's top-10 rotation, weighted by
    minutes, rated on Box Plus/Minus (this season blended with last). It picks up trades and
    signings as they happen and reads player form directly, not just team results.
+   Recent games can count more than older ones (a game from `form_half_life` games ago counts half
+   as much as the latest), so a team that has turned a corner moves faster than its season average.
 3. Simulate every remaining game, lowering a team's rating while injured players are out.
 4. Seed each conference by wins, then play the 7-10 play-in tournament.
+
+Home court, the spread of game results, the preseason blend, how much the preseason counts and the
+recent-form half-life are tuned every day against the games already played (predictor/learn.py).
+The tuned values live in data/learned.json; without that file the hand-picked defaults below apply.
 """
 
 from __future__ import annotations
@@ -21,12 +27,22 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .data_io import CONFERENCES, GAMES, Injury, Move, Team
+from .data_io import CONFERENCES, GAMES, Injury, Move, Team, load_learned
+
+# Hand-picked starting values. predictor/learn.py replaces them with values tuned on this season's games.
+DEFAULTS = {
+    "home_court": 2.5,        # points
+    "logistic_scale": 7.0,    # spread of single-game outcomes
+    "last_share": 0.75,       # preseason blend: share on last season, the rest on the win total line
+    "evidence_games": 7,      # how many games of evidence the preseason rating counts for
+    "form_half_life": 0,      # games until an old result counts half as much as the latest (0 = all equal)
+}
+LEARNED = {**DEFAULTS, **load_learned().get("settings", {})}
 
 LEAGUE_WINS = GAMES * 30 // 2   # 1,230 wins in a season
 WINS_PER_POINT = 2.7            # one point of average margin is worth about 2.7 wins
-HOME_COURT = 2.5                # points
-LOGISTIC_SCALE = 7.0            # spread of single-game outcomes
+HOME_COURT = float(LEARNED["home_court"])
+LOGISTIC_SCALE = float(LEARNED["logistic_scale"])
 LAST_SEASON_KEEP = 0.7          # regress last season's net rating 30% toward average
 PRESEASON_GHOST_GAMES = 3       # add a 3-3 ghost record: exhibition games are noisy
 RATING_SD = 3.0                 # uncertainty in a preseason rating, points
@@ -37,12 +53,11 @@ ROSTER_SIZE = 10                # players in the rotation that the roster rating
 
 @dataclass
 class Settings:
-    weight_last: float = 75
-    weight_line: float = 25
+    weight_last: float = round(100 * LEARNED["last_share"])
+    weight_line: float = 100 - round(100 * LEARNED["last_share"])
     weight_preseason: float = 0
-    evidence_games: float = 7     # how many games of evidence the preseason rating counts for
-    # With ~11 games played (Nov 11) these defaults give 30% last season, 10% win total and 60%
-    # games so far; the games share keeps growing (about 85% by midseason).
+    evidence_games: float = LEARNED["evidence_games"]   # games of evidence the preseason rating counts for
+    form_half_life: float = LEARNED["form_half_life"]   # 0 = every game this season counts the same
     sims: int = 5000
     seed: int | None = None
 
@@ -105,6 +120,42 @@ def observed_margin(team: Team) -> float:
     return (1 - RECORD_SHARE) * team.point_diff + RECORD_SHARE * record_margin(team)
 
 
+def _weighted_observed(margins: list[float], half_life: float) -> float:
+    m = np.array(margins, dtype=float)
+    w = 0.5 ** (np.arange(len(m))[::-1] / half_life) if half_life else np.ones(len(m))
+    diff = (w * m).sum() / w.sum()
+    record = ((w * (m > 0)).sum() / w.sum() - 0.5) * GAMES / WINS_PER_POINT
+    return (1 - RECORD_SHARE) * diff + RECORD_SHARE * record
+
+
+def team_margins(games: list[dict] | None) -> dict[str, list[float]]:
+    """Each team's game margins this season, oldest first."""
+    out: dict[str, list[float]] = {}
+    for g in sorted((g for g in games or [] if g.get("home_pts") is not None and g.get("away_pts") is not None),
+                    key=lambda g: (g["date"], g["home"])):
+        m = g["home_pts"] - g["away_pts"]
+        out.setdefault(g["home"], []).append(m)
+        out.setdefault(g["away"], []).append(-m)
+    return out
+
+
+def form_adjustment(teams: list[Team], games: list[dict] | None, half_life: float) -> np.ndarray:
+    """Points to add to each team's observed margin so recent games count more than old ones.
+
+    It's the difference between the recency-weighted and the plain average of the team's games, so
+    it is zero when the half-life is off and edits to the standings themselves still count.
+    """
+    out = np.zeros(len(teams))
+    if not half_life or not games:
+        return out
+    margins = team_margins(games)
+    for i, t in enumerate(teams):
+        m = margins.get(t.id)
+        if m:
+            out[i] = _weighted_observed(m, half_life) - _weighted_observed(m, 0)
+    return out
+
+
 def roster_ratings(teams: list[Team], players: list[dict] | None) -> np.ndarray | None:
     """Healthy-roster strength in points of margin vs average, from player Box Plus/Minus.
 
@@ -131,8 +182,10 @@ def roster_share(players: list[dict] | None) -> float:
 
 
 def team_ratings(teams: list[Team], moves: list[Move], s: Settings, injuries: list[Injury] = (),
-                 players: list[dict] | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Return (rating, rating_sd, preseason_prior) arrays, one entry per team. Ratings are healthy."""
+                 players: list[dict] | None = None, games: list[dict] | None = None,
+                 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return (rating, rating_sd, preseason_prior) arrays, one entry per team. Ratings are healthy.
+    `games` (with scores) lets recent results count more, per `s.form_half_life`."""
     a, b, c = blend_weights(s)
     comp = components(teams, moves)
     raw = a * comp["last"] + b * comp["line"] + c * comp["preseason"]
@@ -141,6 +194,7 @@ def team_ratings(teams: list[Team], moves: list[Move], s: Settings, injuries: li
     k = s.evidence_games
     gp = np.array([t.games_played for t in teams], dtype=float)
     observed = np.array([observed_margin(t) for t in teams])
+    observed += np.where(gp > 0, form_adjustment(teams, games, s.form_half_life), 0.0)
     rating = (prior * k + observed * gp + healthy_bonus(teams, injuries)) / (k + gp)
     roster = roster_ratings(teams, players)
     if roster is not None:
@@ -193,11 +247,11 @@ def clinch_status(team: Team, teams: list[Team]) -> str:
 
 
 def simulate(teams: list[Team], injuries: list[Injury], moves: list[Move], s: Settings | None = None,
-             players: list[dict] | None = None) -> list[dict]:
+             players: list[dict] | None = None, games: list[dict] | None = None) -> list[dict]:
     s = s or Settings()
     rng = np.random.default_rng(s.seed)
     n, N = len(teams), s.sims
-    rating, sd, prior = team_ratings(teams, moves, s, injuries, players)
+    rating, sd, prior = team_ratings(teams, moves, s, injuries, players, games)
     pen = injury_penalties(teams, injuries)
     left = np.array([t.games_left for t in teams])
 

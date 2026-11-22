@@ -107,7 +107,7 @@ def model_inputs(settings: Settings | None = None):
     s = settings or Settings()
     teams, injuries, moves = load_all()
     players = load_players()
-    rating, _, _ = team_ratings(teams, moves, s, injuries, players)
+    rating, _, _ = team_ratings(teams, moves, s, injuries, players, load_games())
     pens = injury_penalties(teams, injuries)
     return ({t.id: float(rating[i]) for i, t in enumerate(teams)},
             {t.id: [float(x) for x in pens[i]] for i, t in enumerate(teams)})

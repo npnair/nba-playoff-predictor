@@ -7,8 +7,8 @@ import csv
 from datetime import date
 from pathlib import Path
 
-from .data_io import CONFERENCES, DATA_DIR, load_all, load_players
-from .model import Settings, roster_share, simulate
+from .data_io import CONFERENCES, DATA_DIR, load_all, load_games, load_players
+from .model import HOME_COURT, Settings, roster_share, simulate
 
 
 def pct(v: float) -> str:
@@ -40,10 +40,12 @@ def main() -> None:
     p = argparse.ArgumentParser(description="Simulate the 2026-27 NBA season and project playoff seeds.")
     p.add_argument("--sims", type=int, default=5000, help="number of simulated seasons (default 5000)")
     p.add_argument("--seed", type=int, default=None, help="random seed for repeatable results")
-    p.add_argument("--weights", type=float, nargs=3, metavar=("LAST", "LINE", "PRESEASON"), default=(75, 25, 0),
-                   help="relative weights for last season, win total line and preseason games (default 75 25 0)")
-    p.add_argument("--evidence", type=float, default=7,
-                   help="games of evidence the preseason rating counts for (default 7)")
+    d = Settings()   # defaults come from data/learned.json when it exists
+    p.add_argument("--weights", type=float, nargs=3, metavar=("LAST", "LINE", "PRESEASON"),
+                   default=(d.weight_last, d.weight_line, d.weight_preseason),
+                   help="relative weights for last season, win total line and preseason games (default: learned)")
+    p.add_argument("--evidence", type=float, default=d.evidence_games,
+                   help="games of evidence the preseason rating counts for (default: learned)")
     p.add_argument("--data-dir", type=Path, default=DATA_DIR, help="folder holding the CSV inputs")
     p.add_argument("--out", type=Path, default=None, help="optional CSV file for the full results")
     p.add_argument("--bracket", action="store_true",
@@ -55,13 +57,15 @@ def main() -> None:
 
     teams, injuries, moves = load_all(args.data_dir)
     players = load_players(args.data_dir)
+    games = load_games(args.data_dir)
     settings = Settings(*args.weights, evidence_games=args.evidence, sims=args.sims, seed=args.seed)
-    results = simulate(teams, injuries, moves, settings, players)
+    results = simulate(teams, injuries, moves, settings, players, games)
 
     gp = sum(t.games_played for t in teams) / len(teams)
     print(f"Simulated {args.sims:,} seasons. Average games played: {gp:.1f}. "
           f"Weight on 2026-27 games: {(1 - roster_share(players)) * gp / (gp + args.evidence):.0%}"
-          f"{f', on current roster player stats: {roster_share(players):.0%}' if players else ''}.")
+          f"{f', on current roster player stats: {roster_share(players):.0%}' if players else ''}."
+          f" Home court {HOME_COURT:g} pts{f', recent-form half-life {settings.form_half_life:g} games' if settings.form_half_life else ''}.")
     for conf in CONFERENCES:
         print_conference(conf, results)
     print("\n  * clinched a top-6 seed   x eliminated from the play-in   Rtg and Moves in points per game")
@@ -91,7 +95,7 @@ def print_bracket(teams, injuries, moves, settings, results) -> None:
     if not players:
         print("\nNo player data yet (data/players.csv); run scripts/update_standings.py first.")
         return
-    rating, _, _ = team_ratings(teams, moves, settings, injuries, players)
+    rating, _, _ = team_ratings(teams, moves, settings, injuries, players, games)
     pen = injury_penalties(teams, injuries)
     ratings = {t.id: float(rating[i] - pen[i, t.games_left]) for i, t in enumerate(teams)}
     left = {t.id: t.games_left for t in teams}

@@ -13,11 +13,14 @@
   ];
   const INT_FIELDS = new Set(["w", "l", "pre_w", "pre_l"]);
   const SLIDERS = ["wLast", "wLine", "wPre", "kRange"];
-  // Default weights. Bump SETTINGS_VERSION when these change so visitors' saved sliders reset to them.
+  // Default slider positions come from the settings the model tuned on this season's games
+  // (predictor/learn.py). When those change, visitors' saved sliders reset to the new defaults.
   // kRange runs backwards from the model's evidence games so that right means "this season counts more"
   const K_FLIP = 63;   // slider min + max
-  const DEFAULTS = { wLast: 75, wLine: 25, wPre: 0, kRange: K_FLIP - 7 };
-  const SETTINGS_VERSION = 3;
+  const L = M.LEARNED;
+  const lastPct = Math.round(100 * L.last_share);
+  const DEFAULTS = { wLast: lastPct, wLine: 100 - lastPct, wPre: 0, kRange: K_FLIP - Math.round(L.evidence_games) };
+  const SETTINGS_VERSION = "4:" + JSON.stringify(DEFAULTS);
 
   const $ = (id) => document.getElementById(id);
   // Saved edits only apply to the exact data they were made on. The label alone isn't enough: a
@@ -35,6 +38,7 @@
 
   const players = (DATA.players || []).map(([team, bref_id, player, pos, mpg, bpm]) => ({ team, bref_id, player, pos, mpg, bpm }));
   const rosterW = M.rosterShare(players);
+  const games = (DATA.games || []).map(([date, home, away, home_pts, away_pts]) => ({ date, home, away, home_pts, away_pts }));
 
   let teams = clone(DATA.teams);
   let injuries = clone(DATA.injuries);
@@ -74,7 +78,7 @@
   function settings() {
     return {
       weightLast: $("wLast").value, weightLine: $("wLine").value, weightPreseason: $("wPre").value,
-      evidenceGames: evidenceGames(), sims: $("simSel").value,
+      evidenceGames: evidenceGames(), formHalfLife: L.form_half_life, sims: $("simSel").value,
     };
   }
   function showWeights() {
@@ -174,7 +178,7 @@
     btn.disabled = true;
     btn.textContent = "Simulating…";
     requestAnimationFrame(() => setTimeout(() => {
-      results = M.simulate(teams, injuries, moves, settings(), seededRandom(DATA.asOf), players);
+      results = M.simulate(teams, injuries, moves, settings(), seededRandom(DATA.asOf), players, games);
       $("simStat").textContent = (+$("simSel").value).toLocaleString();
       render();
       window.dispatchEvent(new CustomEvent("pl:results", { detail: { teams, injuries, results, players, settings: settings() } }));
@@ -316,6 +320,7 @@
   });
 
   $("asof").value = DATA.asOf;
+  Object.entries(DEFAULTS).forEach(([id, v]) => { $(id).value = v; });
   load();
   showWeights();
   buildTeamEditor();

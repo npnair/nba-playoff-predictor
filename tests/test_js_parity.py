@@ -11,6 +11,9 @@ from predictor.data_io import Injury
 from predictor.playoffs import Context, full_bracket, out_for_playoffs
 
 ROOT = Path(__file__).resolve().parent.parent
+# The web page gets the learned settings from data.js; hand the same ones to node.
+LEARNED = (ROOT / "data" / "learned.json").read_text() if (ROOT / "data" / "learned.json").exists() else "{}"
+PRELUDE = f"globalThis.PL_DATA = {{ learned: {LEARNED} }};"
 WEST = [f"W{i}" for i in range(10)]
 EAST = [f"E{i}" for i in range(10)]
 
@@ -52,7 +55,7 @@ def test_js_and_python_brackets_match():
     payload = json.dumps({"ratings": ratings, "players": players, "games": games, "wins": wins, "left": left,
                           "injuries": [{"team": j.team, "player": j.player, "games_out": j.games_out} for j in injuries],
                           "west": WEST, "east": EAST})
-    script = f"""
+    script = PRELUDE + f"""
       require({json.dumps(str(ROOT / 'docs/js/playoffs.js'))});
       const P = globalThis.PL_PLAYOFFS, d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
       const ctx = P.makeContext(d.ratings, d.players, d.games, P.outForPlayoffs(d.players, d.injuries, d.left));
@@ -76,20 +79,23 @@ def test_js_and_python_ratings_match_with_injuries():
     from predictor.data_io import load_all, load_players
     from predictor.model import Settings, injury_wins_lost, roster_share, team_ratings
 
+    from predictor.data_io import load_games
+
     teams, injuries, moves = load_all()
-    players = load_players()
-    s = Settings()
-    py_r = team_ratings(teams, moves, s, injuries, players)[0]
+    players, games = load_players(), load_games()
+    s = Settings(form_half_life=8)   # exercise the recent-form weighting too
+    py_r = team_ratings(teams, moves, s, injuries, players, games)[0]
     py_inj = [injury_wins_lost(t, injuries, s.evidence_games, roster_share(players)) for t in teams]
     payload = json.dumps({"teams": [asdict(t) for t in teams], "injuries": [asdict(j) for j in injuries],
                           "moves": [asdict(m) for m in moves], "k": s.evidence_games, "players": players,
-                          "s": {"weightLast": s.weight_last, "weightLine": s.weight_line,
+                          "games": games,
+                          "s": {"weightLast": s.weight_last, "weightLine": s.weight_line, "formHalfLife": s.form_half_life,
                                 "weightPreseason": s.weight_preseason, "evidenceGames": s.evidence_games}})
-    script = f"""
+    script = PRELUDE + f"""
       require({json.dumps(str(ROOT / 'docs/js/model.js'))});
       const M = globalThis.PL_MODEL, d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
       console.log(JSON.stringify({{
-        r: M.ratings(d.teams, d.moves, d.s, d.injuries, d.players).map((x) => x.rating),
+        r: M.ratings(d.teams, d.moves, d.s, d.injuries, d.players, d.games).map((x) => x.rating),
         inj: d.teams.map((t) => M.injuryWinsLost(t, d.injuries, d.k, M.rosterShare(d.players))),
       }}));
     """
@@ -111,7 +117,7 @@ def test_js_and_python_week_predictions_match():
     ratings, pen = model_inputs()
     py = predict_games(ratings, pen, games, start)
     payload = json.dumps({"ratings": ratings, "pen": pen, "games": games, "start": start})
-    script = f"""
+    script = PRELUDE + f"""
       require({json.dumps(str(ROOT / 'docs/js/model.js'))});
       const M = globalThis.PL_MODEL, d = JSON.parse(require('fs').readFileSync(0, 'utf8'));
       console.log(JSON.stringify({{ start: M.nextGameDay(d.games), preds: M.predictGames(d.ratings, d.pen, d.games, d.start) }}));

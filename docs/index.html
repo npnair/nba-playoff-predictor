@@ -121,12 +121,14 @@
     </section>
     <section id="weekDays" class="week-days"></section>
     <section class="panel" id="weekGraded"></section>
+    <section class="panel" id="weekLearned"></section>
     <section class="panel">
       <h2>How a score is predicted</h2>
       <div class="method">
-        <div><h3>Who wins</h3><p>Each team's rating from the standings model, minus any player still out for that particular game, plus 2.5 points for home court. The same rating gap sets the win probability.</p></div>
+        <div><h3>Who wins</h3><p>Each team's rating from the standings model, minus any player still out for that particular game, plus <span id="hcaText">2.5</span> points for home court (tuned on this season's games). The same rating gap sets the win probability.</p></div>
         <div><h3>The score</h3><p>The total comes from how many points each team's games have produced this season, pulled toward the league average while samples are small. The predicted margin splits that total into a final score.</p></div>
         <div><h3>Player stats</h3><p>20% of every team rating now comes from its current roster: the top 10 players by minutes, rated on Box Plus/Minus. Trades and hot or cold players show up right away, in the standings, the bracket and these games.</p></div>
+        <div><h3>Learning from misses</h3><p>Each morning the model replays every game so far, rating teams only on what it knew before each one, and keeps the settings that would have called those games best. Those settings feed the standings, the bracket and the next week's picks.</p></div>
         <div><h3>Keeping score</h3><p>Every morning the daily update saves that day's predictions before tipoff. Once a game is final it's graded against the real score, so the season record above can't be edited after the fact.</p></div>
       </div>
     </section>

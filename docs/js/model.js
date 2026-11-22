@@ -2,11 +2,16 @@
 (function (global) {
   "use strict";
 
+  // Hand-picked starting values, replaced by the settings tuned on this season's games
+  // (predictor/learn.py, shipped in data.js as PL_DATA.learned).
+  const DEFAULTS = { home_court: 2.5, logistic_scale: 7.0, last_share: 0.75, evidence_games: 7, form_half_life: 0 };
+  const LEARNED = Object.assign({}, DEFAULTS, (global.PL_DATA && global.PL_DATA.learned && global.PL_DATA.learned.settings) || {});
+
   const GAMES = 82;
   const LEAGUE_WINS = 1230;
   const WINS_PER_POINT = 2.7;
-  const HOME_COURT = 2.5;
-  const LOGISTIC_SCALE = 7.0;
+  const HOME_COURT = +LEARNED.home_court;
+  const LOGISTIC_SCALE = +LEARNED.logistic_scale;
   const LAST_SEASON_KEEP = 0.7;
   const PRESEASON_GHOST_GAMES = 3;
   const RATING_SD = 3.0;
@@ -55,6 +60,31 @@
     return (1 - RECORD_SHARE) * t.point_diff + RECORD_SHARE * record;
   }
 
+  // Recency-weighted observed margin of a list of margins (oldest first). halfLife 0 = plain average.
+  function weightedObserved(m, halfLife) {
+    let sw = 0, sm = 0, swin = 0;
+    m.forEach((x, i) => {
+      const w = halfLife ? Math.pow(0.5, (m.length - 1 - i) / halfLife) : 1;
+      sw += w; sm += w * x; swin += w * (x > 0 ? 1 : 0);
+    });
+    return (1 - RECORD_SHARE) * (sm / sw) + RECORD_SHARE * (swin / sw - 0.5) * GAMES / WINS_PER_POINT;
+  }
+
+  // Points added to each team's observed margin so recent games count more. Mirrors form_adjustment.
+  function formAdjustment(teams, games, halfLife) {
+    if (!(+halfLife > 0) || !games || !games.length) return teams.map(() => 0);
+    const margins = {};
+    games.filter(isPlayed).sort(byDateHome).forEach((g) => {
+      const m = g.home_pts - g.away_pts;
+      (margins[g.home] = margins[g.home] || []).push(m);
+      (margins[g.away] = margins[g.away] || []).push(-m);
+    });
+    return teams.map((t) => {
+      const m = margins[t.id];
+      return m && m.length ? weightedObserved(m, +halfLife) - weightedObserved(m, 0) : 0;
+    });
+  }
+
   // Healthy-roster strength from player BPM: top-10 rotation, minutes scaled to five on the floor,
   // centered on the league. null when there is no player data. Mirrors roster_ratings in model.py.
   function rosterRatings(teams, players) {
@@ -74,16 +104,17 @@
   }
   const rosterShare = (players) => (players && players.length ? ROSTER_SHARE : 0);
 
-  function ratings(teams, moves, s, injuries = [], players = null) {
+  function ratings(teams, moves, s, injuries = [], players = null, games = null) {
     const [a, b, c] = blendWeights(s);
     const raw = components(teams, moves).map((m) => a * m.last + b * m.line + c * m.preseason);
     const mean = raw.reduce((x, y) => x + y, 0) / raw.length;
     const k = +s.evidenceGames;
     const roster = rosterRatings(teams, players);
+    const form = formAdjustment(teams, games, s.formHalfLife == null ? LEARNED.form_half_life : s.formHalfLife);
     return teams.map((t, i) => {
       const prior = raw[i] - mean;
       const gp = gamesPlayed(t);
-      const observed = observedMargin(t);
+      const observed = observedMargin(t) + (gp > 0 ? form[i] : 0);
       const blended = (prior * k + observed * gp + healthyBonus(t, injuries)) / (k + gp);
       return {
         prior,
@@ -215,8 +246,8 @@
     return "";
   }
 
-  function simulate(teams, injuries, moves, s, rand = Math.random, players = null) {
-    const R = ratings(teams, moves, s, injuries, players);
+  function simulate(teams, injuries, moves, s, rand = Math.random, players = null, games = null) {
+    const R = ratings(teams, moves, s, injuries, players, games);
     const P = penalties(teams, injuries);
     const n = teams.length, N = +s.sims;
     const tally = teams.map(() => ({ top6: 0, playIn: 0, playoffs: 0, seed: 0, wins: 0 }));
@@ -272,7 +303,7 @@
   }
 
   global.PL_MODEL = {
-    GAMES, gamesPlayed, gamesLeft, blendWeights, moveTotal, components, healthyBonus, observedMargin, rosterRatings, nextGameDay, weekEnd, teamScoring, predictGames, grade, isPlayed, rosterShare, ROSTER_SHARE, ratings,
+    DEFAULTS, LEARNED, HOME_COURT, formAdjustment, GAMES, gamesPlayed, gamesLeft, blendWeights, moveTotal, components, healthyBonus, observedMargin, rosterRatings, nextGameDay, weekEnd, teamScoring, predictGames, grade, isPlayed, rosterShare, ROSTER_SHARE, ratings,
     penalties, winProb, simulate, injuryWinsLost, clinchStatus,
   };
 })(typeof window !== "undefined" ? window : globalThis);

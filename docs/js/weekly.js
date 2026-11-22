@@ -149,6 +149,32 @@
     }).join("");
   }
 
+  // ---------- what the model learned from its picks (fixed, so drawn once) ----------
+  function renderLearned() {
+    const L = DATA.learned, el = $("weekLearned");
+    if ($("hcaText")) $("hcaText").textContent = M.HOME_COURT;
+    if (!L || !L.settings) { el.hidden = true; return; }
+    const s = L.settings, d = L.defaults || M.DEFAULTS, c = L.check || {};
+    const split = (x) => `${Math.round(x * 100)} / ${100 - Math.round(x * 100)}`;
+    const form = (h) => (+h ? `a game ${h} games back counts half` : "every game counts the same");
+    const rows = [
+      ["Home court", `${d.home_court} pts`, `${s.home_court} pts`, "Points the home team gets in every pick."],
+      ["Preseason rating is worth", `${d.evidence_games} games`, `${s.evidence_games} games`, "Higher means this season's results take over more slowly."],
+      ["Last season / win total", split(d.last_share), split(s.last_share), "How the preseason rating is built."],
+      ["Recent form", form(d.form_half_life), form(s.form_half_life), "Whether newer games count more than older ones."],
+      ["Upset room", `${d.logistic_scale}`, `${s.logistic_scale}`, "Higher means more upsets expected, so less confident picks."],
+    ].map(([label, was, now, what]) => `<tr${was === now ? "" : ' class="changed"'}><td class="l">${label}</td><td>${was}</td><td><b>${now}</b></td><td class="l why">${what}</td></tr>`).join("");
+    const lc = c.learned || {}, fc = c.fixed || {};
+    const check = lc.games
+      ? `<p class="hint" style="margin-top:10px">Fair test, over ${lc.games} games since ${fmtShort(c.since)}: each day it tuned itself only on earlier games and was graded on that day's games. Learning went <b>${lc.right}–${lc.games - lc.right}</b> (${pct(lc.pct)}) with a typical margin miss of ${(+lc.margin_off).toFixed(1)} points. The starting settings would have gone ${fc.right}–${fc.games - fc.right} (${pct(fc.pct)}), missing by ${(+fc.margin_off).toFixed(1)}.</p>`
+      : `<p class="hint" style="margin-top:10px">Not enough games yet to test the learning fairly, so the starting settings are in use.</p>`;
+    el.innerHTML = `<h2>What it learned from its picks</h2>
+      <p class="hint">Updated ${fmtShort(L.updated)} from ${L.games} games. Every morning the model replays the season so far, rating teams on only what it knew before each game, and keeps the settings that would have called those games best. A small pull toward the starting values stops one odd week from swinging things. These settings drive the standings, the bracket and the picks above.</p>
+      <div class="scroll"><table class="graded learned"><thead><tr><th class="l">Setting</th><th>Started at</th><th>Now</th><th class="l">What it does</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${check}`;
+  }
+
   renderGraded();
+  renderLearned();
   window.addEventListener("pl:results", (e) => renderWeek(e.detail));
 })();

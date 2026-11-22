@@ -172,7 +172,7 @@
       ${factor("Season series", Math.round(W.h2h * 100) + "%", s.h2h, a, b, h2hNote)}
       <div class="factor total"><span class="lbl">Combined edge</span>
         <span class="val">${Math.abs(s.margin) < 0.05 ? "even" : `${esc(s.margin >= 0 ? a : b)} by ${Math.abs(s.margin).toFixed(1)} pts a game`}</span>
-        <span class="note">On a neutral court. Home court adds 2.5 points to whoever is hosting.</span></div>`;
+        <span class="note">On a neutral court. Home court adds ${PO.HOME_COURT} points to whoever is hosting.</span></div>`;
 
     let dist = "";
     if (s.kind === "series") {

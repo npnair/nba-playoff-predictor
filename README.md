@@ -23,11 +23,29 @@ WESTERN CONFERENCE
    - **Last season (75%)**: 2025–26 net rating, regressed 30% toward average, plus an adjustment for each offseason move (`data/moves.csv`). The moves table is what makes last season's number describe this season's roster.
    - **Preseason win total (25%)**: the betting line, converted at 2.7 wins per point of margin. Lines are scaled so the league totals exactly 1,230 wins.
    - **Preseason games (0%, off by default)**: exhibition record, smoothed with a 3–3 ghost record because four or five preseason games say very little.
-2. **In-season blend.** Once games are played, each team's actual results are mixed in: 80% point differential and 20% win-loss record (turned into points), so a team that keeps closing out tight games gets a little credit without letting early-season luck take over. The preseason rating counts as 7 games of evidence by default. On the web page this is the "How much this season counts" slider: sliding right lowers that number, so this season's games count for more. With about 12 games played (mid-November) and the roster's 20% included, that works out to about 51% games so far, 20% roster, 22% last season and 7% win total, and the games-so-far share keeps growing through the season.
+2. **In-season blend.** Once games are played, each team's actual results are mixed in: 80% point differential and 20% win-loss record (turned into points), so a team that keeps closing out tight games gets a little credit without letting early-season luck take over. The preseason rating counts as a number of games of evidence that the model tunes itself (7 to start; see "Learning from its own picks"). On the web page this is the "How much this season counts" slider: sliding right lowers that number, so this season's games count for more. With 16 games played (Nov 21) and the learned setting of 20 games, that works out to about 36% games so far, 20% roster, 33% last season and 11% win total, and the games-so-far share keeps growing through the season.
 3. **Current roster.** 20% of each team's rating comes from its roster today: the top 10 players by minutes, weighted by minutes and rated on Box Plus/Minus (this season blended with last). Trades, signings and players' form show up right away. Rosters and player stats refresh every morning.
 4. **Injuries, game by game.** Each injury has an impact (net rating points) and a number of games out. In every simulated season the team plays weaker for exactly those games. Opponents' injuries count too. Each injury also records the games the player has already missed. His absence is already in the team's point differential, so the model adds those games back before blending, which keeps the rating on a healthy-roster footing and stops an injury from being counted twice.
-5. **Simulate.** Each remaining game is played against a random opponent with home court worth 2.5 points, and a logistic curve turns the rating gap into a win probability. Each simulated season also draws a random shock to every team's rating, sized by how uncertain that rating still is.
+5. **Simulate.** Each remaining game is played against a random opponent with home court worth the learned number of points (2.5 to start), and a logistic curve turns the rating gap into a win probability. Each simulated season also draws a random shock to every team's rating, sized by how uncertain that rating still is.
 6. **Seed and play in.** Teams are ranked by wins in each conference. Seeds 7 vs 8 and 9 vs 10 play, then the 7/8 loser hosts the 9/10 winner for the final playoff spot.
+
+### Learning from its own picks
+
+Every morning, before the day's predictions are saved, `predictor/learn.py` retunes the model on the games played so far. It replays the season in date order: on each game day it rates every team using only the games before that day, predicts that day's games, and scores the predictions against the real results. It does this for every combination of five settings and keeps the one whose win probabilities matched the results best (lowest log loss). The result is saved to `data/learned.json` and used by the standings, the weekly picks and the bracket, in Python and on the web page.
+
+| Setting | What it controls | Allowed values |
+|---|---|---|
+| Home court | points the home team gets | 1.0 to 3.5 |
+| Preseason worth | how many games the preseason rating counts for, so how fast this season takes over | 5 to 30 games |
+| Last season / win total | how the preseason rating is split | 50/50 to 90/10 |
+| Recent form | how fast old games fade (a game N games back counts half) | off, or 6 to 30 games |
+| Upset room | how spread out game results are, which sets how confident the picks are | 6.0 to 8.0 |
+
+Why tune settings rather than bump a team up after a miss? The season's point differential already moves every team's rating after each game, so a separate "fix the miss" bonus would count the same game twice. Tuning is what changes *how* the model reacts to its mistakes. Three guardrails keep it from chasing noise: the allowed ranges above (widening them made the out-of-sample results worse), a small pull toward the starting values, and no learning at all until 100 games have been played.
+
+The page reports a fair test: each day, settings tuned only on earlier games, graded on that day's games, next to what the original fixed settings would have done. Through Nov 21 (173 games tested), learning went 121–52 (69.9%) against 120–53 (69.4%) for the fixed settings, and missed the margin by 14.3 points against 14.4. That's a small edge, as expected this early; single NBA games are noisy. Run `python -m predictor.learn` to see the current numbers.
+
+The replay doesn't know who was injured on each past date and uses today's player stats throughout, so it judges settings on slightly less information than the live model has.
 
 The output for each team is projected wins, the chance of a top 6 seed, the chance of landing in the play-in, and the overall chance of making the playoffs (top 6 or winning the play-in). Teams that have mathematically locked up a top 6 seed are marked clinched, and teams that can no longer reach the top 10 are marked eliminated (tiebreakers ignored).
 
@@ -98,7 +116,8 @@ ESPN standings feed ──► validate ──► data/standings.csv ──► ru
 2. **Validate.** The feed is unofficial, so the run stops without writing anything if any team is missing or unrecognized, a record is impossible, league wins and losses don't balance, a point differential is implausible, or a team's record went backwards since the last run.
 3. **Transform and load.** ESPN team codes are mapped to the project's (for example `GS` to `GSW`), point differential per game is computed from points for and against, and `data/standings.csv` is rewritten.
    The same run refreshes the bracket's inputs from Basketball-Reference (about 38 requests, paced to its limit of 20 a minute): every game's result (`data/games.csv`), each team's current roster, and player minutes and Box Plus/Minus (`data/players.csv`). If any of these fail, the last good file is kept and the standings update still goes through.
-4. **Model and publish.** The model reruns with a date-based seed so results are reproducible. The web page's data, the latest projections and a running history of every team's odds are refreshed, the tests run on the new data, and the changes are committed.
+4. **Learn.** `python -m predictor.learn --write` retunes the model's settings on every game played so far (see "Learning from its own picks" above).
+5. **Model and publish.** The model reruns with a date-based seed so results are reproducible. The web page's data, the latest projections and a running history of every team's odds are refreshed, the tests run on the new data, and the changes are committed.
 
 If there were no games since the last run, nothing is committed. If the feed fails validation, the run shows a red X in the Actions tab and the last good data stays in place. You can also start a run by hand from **Actions → update standings → Run workflow**.
 
@@ -131,10 +150,11 @@ You can also update standings in the browser (paste them into the Team stats pan
 
 ```
 nba-playoff-predictor/
-├── data/                    CSV inputs, the single source of truth
+├── data/                    CSV inputs, the single source of truth, plus learned.json (tuned settings)
 ├── predictor/
 │   ├── data_io.py           load and validate the CSVs
 │   ├── model.py             ratings, injuries, season simulation, play-in, clinch logic
+│   ├── learn.py             retunes the model's settings each day by replaying the season's games
 │   ├── standings_source.py  fetch and validate the ESPN standings feed
 │   ├── playoffs.py          bracket model: starting fives, season series, best-of-seven odds
 │   ├── playoff_history.py   each player's playoff form compared with the regular season

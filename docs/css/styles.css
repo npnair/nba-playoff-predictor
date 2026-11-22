@@ -231,3 +231,5 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.82rem}
 .pick-line.miss .mark{color:var(--bad)}
 .game.played.ok{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
 .game.played.miss{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.graded.learned tr.changed td b{color:var(--ball)}
+.graded.learned td.why{white-space:normal;color:var(--muted)}

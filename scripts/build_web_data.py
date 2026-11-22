@@ -41,7 +41,7 @@ def main() -> None:
     args = p.parse_args()
 
     teams, injuries, moves = load_all()
-    from predictor.data_io import load_games, load_players
+    from predictor.data_io import load_games, load_learned, load_players
     from predictor.weekly import next_game_day, read_predictions
     preds = read_predictions(ROOT / "results" / "game_predictions.csv")
     payload = {
@@ -51,6 +51,8 @@ def main() -> None:
         "moves": [asdict(m) for m in moves],
         "games": [[g["date"], g["home"], g["away"], g["home_pts"], g["away_pts"]] for g in load_games()],
         "weekStart": next_game_day(load_games()),
+        # Settings the model tuned on this season's games (predictor/learn.py)
+        "learned": load_learned(),
         # Saved before each game was played: [date, home, away, pred_home, pred_away, home_win_prob]
         "predictions": [[r["date"], r["home"], r["away"], int(r["pred_home"]), int(r["pred_away"]),
                          float(r["home_win_prob"])] for r in preds],
