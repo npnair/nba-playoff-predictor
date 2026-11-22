@@ -102,7 +102,7 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.82rem}
 .foot a{color:var(--playin)}
 
 /* ---------- tabs ---------- */
-.tabs{display:flex;gap:4px;border-bottom:2px solid var(--ink);margin-bottom:-8px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;border-bottom:2px solid var(--ink);margin-bottom:-8px}
 .tabs button{font-family:var(--display);font-weight:700;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase;
   background:transparent;color:var(--muted);border:0;border-radius:6px 6px 0 0;padding:9px 18px 7px;cursor:pointer}
 .tabs button[aria-selected="true"]{background:var(--ink);color:var(--surface)}
@@ -233,3 +233,4 @@ textarea{width:100%;min-height:110px;font-family:var(--mono);font-size:.82rem}
 .game.played.miss{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
 .graded.learned tr.changed td b{color:var(--ball)}
 .graded.learned td.why{white-space:normal;color:var(--muted)}
+.tabs button{white-space:nowrap;flex:none}

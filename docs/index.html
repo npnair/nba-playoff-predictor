@@ -22,6 +22,8 @@
   <nav class="tabs" role="tablist" aria-label="Views">
     <button type="button" role="tab" id="tab-standings" aria-controls="view-standings" aria-selected="true">Standings</button>
     <button type="button" role="tab" id="tab-week" aria-controls="view-week" aria-selected="false" tabindex="-1">This week</button>
+    <button type="button" role="tab" id="tab-recent" aria-controls="view-recent" aria-selected="false" tabindex="-1">Last 7 days</button>
+    <button type="button" role="tab" id="tab-learned" aria-controls="view-learned" aria-selected="false" tabindex="-1">What it learned</button>
     <button type="button" role="tab" id="tab-bracket" aria-controls="view-bracket" aria-selected="false" tabindex="-1">Playoff bracket</button>
   </nav>
 
@@ -120,8 +122,6 @@
       <div class="champ" id="weekRecord"></div>
     </section>
     <section id="weekDays" class="week-days"></section>
-    <section class="panel" id="weekGraded"></section>
-    <section class="panel" id="weekLearned"></section>
     <section class="panel">
       <h2>How a score is predicted</h2>
       <div class="method">
@@ -132,6 +132,14 @@
         <div><h3>Keeping score</h3><p>Every morning the daily update saves that day's predictions before tipoff. Once a game is final it's graded against the real score, so the season record above can't be edited after the fact.</p></div>
       </div>
     </section>
+  </div>
+
+  <div class="view" id="view-recent" role="tabpanel" aria-labelledby="tab-recent" hidden>
+    <section class="panel" id="weekGraded"></section>
+  </div>
+
+  <div class="view" id="view-learned" role="tabpanel" aria-labelledby="tab-learned" hidden>
+    <section class="panel" id="weekLearned"></section>
   </div>
 
   <div class="view" id="view-bracket" role="tabpanel" aria-labelledby="tab-bracket" hidden>

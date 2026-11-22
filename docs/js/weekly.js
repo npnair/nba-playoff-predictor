@@ -169,7 +169,7 @@
       ? `<p class="hint" style="margin-top:10px">Fair test, over ${lc.games} games since ${fmtShort(c.since)}: each day it tuned itself only on earlier games and was graded on that day's games. Learning went <b>${lc.right}–${lc.games - lc.right}</b> (${pct(lc.pct)}) with a typical margin miss of ${(+lc.margin_off).toFixed(1)} points. The starting settings would have gone ${fc.right}–${fc.games - fc.right} (${pct(fc.pct)}), missing by ${(+fc.margin_off).toFixed(1)}.</p>`
       : `<p class="hint" style="margin-top:10px">Not enough games yet to test the learning fairly, so the starting settings are in use.</p>`;
     el.innerHTML = `<h2>What it learned from its picks</h2>
-      <p class="hint">Updated ${fmtShort(L.updated)} from ${L.games} games. Every morning the model replays the season so far, rating teams on only what it knew before each game, and keeps the settings that would have called those games best. A small pull toward the starting values stops one odd week from swinging things. These settings drive the standings, the bracket and the picks above.</p>
+      <p class="hint">Updated ${fmtShort(L.updated)} from ${L.games} games. Every morning the model replays the season so far, rating teams on only what it knew before each game, and keeps the settings that would have called those games best. A small pull toward the starting values stops one odd week from swinging things. These settings drive the standings, the bracket and the This week picks.</p>
       <div class="scroll"><table class="graded learned"><thead><tr><th class="l">Setting</th><th>Started at</th><th>Now</th><th class="l">What it does</th></tr></thead><tbody>${rows}</tbody></table></div>
       ${check}`;
   }

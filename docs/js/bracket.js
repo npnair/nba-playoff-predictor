@@ -17,6 +17,7 @@
 
   // ---------- tabs ----------
   const tabs = [["standings", $("tab-standings"), $("view-standings")], ["week", $("tab-week"), $("view-week")],
+    ["recent", $("tab-recent"), $("view-recent")], ["learned", $("tab-learned"), $("view-learned")],
     ["bracket", $("tab-bracket"), $("view-bracket")]];
   const tabFromHash = () => (tabs.some(([n]) => n !== "standings" && location.hash === "#" + n) ? location.hash.slice(1) : "standings");
   function show(name, focus) {
@@ -26,6 +27,9 @@
       tab.tabIndex = on ? 0 : -1;
       view.hidden = !on;
       if (on && focus) tab.focus();
+      if (on && tab.parentNode.scrollWidth > tab.parentNode.clientWidth) {   // phones: tabs scroll sideways
+        tab.parentNode.scrollLeft = tab.offsetLeft - (tab.parentNode.clientWidth - tab.offsetWidth) / 2;
+      }
     });
     if (name !== "standings" && location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
     if (name === "standings" && location.hash) history.replaceState(null, "", location.pathname + location.search);
