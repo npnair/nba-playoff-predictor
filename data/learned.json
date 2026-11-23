@@ -1,10 +1,10 @@
 {
- "updated": "2026-11-22",
- "games": 241,
+ "updated": "2026-11-23",
+ "games": 248,
  "settings": {
   "last_share": 0.75,
   "evidence_games": 20,
-  "home_court": 1.5,
+  "home_court": 2.0,
   "form_half_life": 0,
   "logistic_scale": 6.5
  },
@@ -18,18 +18,18 @@
  "check": {
   "since": "2026-10-29",
   "learned": {
-   "right": 121,
-   "games": 173,
-   "pct": 0.6994,
-   "margin_off": 14.31,
-   "log_loss": 0.5875
+   "right": 124,
+   "games": 180,
+   "pct": 0.6889,
+   "margin_off": 14.21,
+   "log_loss": 0.5919
   },
   "fixed": {
-   "right": 120,
-   "games": 173,
-   "pct": 0.6936,
-   "margin_off": 14.44,
-   "log_loss": 0.5923
+   "right": 123,
+   "games": 180,
+   "pct": 0.6833,
+   "margin_off": 14.31,
+   "log_loss": 0.5942
   }
  }
 }
